@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>Ω</text></svg>"/>
+    <title>ResistorCalc Pro - Interactive Visual Resistor Calculator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.15); }
+            50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.3); }
+        }
+        .glow-effect {
+            animation: glow 4s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800 py-4 px-6 sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">ResistorCalc Pro</h1>
+                    <p class="text-xs text-slate-400">Interactive Visual Resistor Calculator</p>
+                </div>
+            </div>
+
+            <!-- Controls Right Group -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Combobox de Valores Mais Usados -->
+                <div class="flex items-center gap-1.5 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 shadow-inner">
+                    <span class="text-xs text-slate-400 font-medium whitespace-nowrap">⚡ Preset:</span>
+                    <select id="preset-select" onchange="selectPreset(this.value)" class="bg-transparent text-xs text-blue-400 font-semibold focus:outline-none cursor-pointer">
+                        <option value="" disabled selected>Valores Comuns...</option>
+                    </select>
+                </div>
+
+                <!-- Mode Switcher -->
+                <div class="flex bg-slate-950 p-1.5 rounded-xl border border-slate-800 shadow-inner">
+                    <button id="btn-4band" onclick="setMode(4)" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md">4 Bands</button>
+                    <button id="btn-5band" onclick="setMode(5)" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white">5 Bands</button>
+                </div>
+
+                <!-- Botão para Inverter a Ordem das Faixas -->
+                <button onclick="reverseBands()" class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-2 text-xs font-semibold rounded-xl border border-slate-800 shadow-md transition-all cursor-pointer" title="Inverte a leitura de trás para frente">
+                    🔄 Inverter Lado
+                </button>
+
+                <!-- Botão de Fechar -->
+                <button onclick="window.close()" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-700 shadow-md transition-all cursor-pointer">
+                    ❌ Fechar e Voltar
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-8">
+        
+        <!-- Resistor Display Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 sm:p-10 shadow-2xl glow-effect flex flex-col items-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+            
+            <div class="text-center mb-6">
+                <span class="inline-block px-3 py-1 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium rounded-full mb-2">Click any band on the resistor or select below</span>
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-widest">Interactive Visual Resistor</h2>
+            </div>
+
+            <!-- SVG Resistor Graphic -->
+            <div class="w-full max-w-2xl py-6 flex justify-center items-center overflow-x-auto">
+                <svg id="resistor-svg" viewBox="0 0 800 300" class="w-full h-auto max-h-64 drop-shadow-xl select-none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Leads -->
+                    <line x1="20" y1="150" x2="180" y2="150" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+                    <line x1="620" y1="150" x2="780" y2="150" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/>
+                    
+                    <!-- Resistor Body (Beige Ceramic) -->
+                    <g filter="drop-shadow(0px 10px 8px rgba(0,0,0,0.4))">
+                        <!-- Left Terminal Cap -->
+                        <path d="M 180 110 L 230 110 A 15 40 0 0 1 230 190 L 180 190 Z" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>
+                        <!-- Right Terminal Cap -->
+                        <path d="M 620 110 L 570 110 A 15 40 0 0 0 570 190 L 620 190 Z" fill="#cbd5e1" stroke="#64748b" stroke-width="3"/>
+                        
+                        <!-- Main Body Cylinder -->
+                        <rect x="230" y="100" width="340" height="100" rx="20" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+                        <!-- 3D Lighting Highlight on Body -->
+                        <path d="M 250 108 L 550 108" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.6"/>
+                        <path d="M 250 192 L 550 192" stroke="#b45309" stroke-width="4" stroke-linecap="round" opacity="0.3"/>
+                    </g>
+
+                    <!-- Resistor Color Bands (Dynamically managed via updateUI) -->
+                    <g class="cursor-pointer group band-group" onclick="openBandModal(0)">
+                        <rect id="svg-band-0" x="260" y="103" width="14" height="94" fill="#6b7280" rx="3" class="transition-transform duration-200 group-hover:scale-y-105"/>
+                        <rect x="258" y="101" width="18" height="98" fill="transparent" stroke="#38bdf8" stroke-width="2" rx="4" class="opacity-0 group-hover:opacity-100 transition-opacity"/>
+                        <text id="svg-label-0" x="267" y="80" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" class="opacity-80 group-hover:opacity-100">B1</text>
+                    </g>
+
+                    <g class="cursor-pointer group band-group" onclick="openBandModal(1)">
+                        <rect id="svg-band-1" x="310" y="103" width="14" height="94" fill="#000000" rx="3" class="transition-transform duration-200 group-hover:scale-y-105"/>
+                        <rect x="308" y="101" width="18" height="98" fill="transparent" stroke="#38bdf8" stroke-width="2" rx="4" class="opacity-0 group-hover:opacity-100 transition-opacity"/>
+                        <text id="svg-label-1" x="317" y="80" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" class="opacity-80 group-hover:opacity-100">B2</text>
+                    </g>
+
+                    <g id="svg-band-2-group" class="cursor-pointer group band-group" onclick="openBandModal(2)">
+                        <rect id="svg-band-2" x="360" y="103" width="14" height="94" fill="#000000" rx="3" class="transition-transform duration-200 group-hover:scale-y-105"/>
+                        <rect x="358" y="101" width="18" height="98" fill="transparent" stroke="#38bdf8" stroke-width="2" rx="4" class="opacity-0 group-hover:opacity-100 transition-opacity"/>
+                        <text id="svg-label-2" x="367" y="80" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" class="opacity-80 group-hover:opacity-100">B3</text>
+                    </g>
+
+                    <g class="cursor-pointer group band-group" onclick="openBandModal(3)">
+                        <rect id="svg-band-3" x="430" y="103" width="14" height="94" fill="#b45309" rx="3" class="transition-transform duration-200 group-hover:scale-y-105"/>
+                        <rect x="428" y="101" width="18" height="98" fill="transparent" stroke="#38bdf8" stroke-width="2" rx="4" class="opacity-0 group-hover:opacity-100 transition-opacity"/>
+                        <text id="svg-label-3" x="437" y="80" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" class="opacity-80 group-hover:opacity-100">B4</text>
+                    </g>
+
+                    <g id="svg-band-4-group" class="cursor-pointer group band-group" onclick="openBandModal(4)">
+                        <rect id="svg-band-4" x="510" y="103" width="14" height="94" fill="#d97706" rx="3" class="transition-transform duration-200 group-hover:scale-y-105"/>
+                        <rect x="508" y="101" width="18" height="98" fill="transparent" stroke="#38bdf8" stroke-width="2" rx="4" class="opacity-0 group-hover:opacity-100 transition-opacity"/>
+                        <text id="svg-label-4" x="517" y="80" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle" class="opacity-80 group-hover:opacity-100">B5</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Results Output Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full mt-6 pt-6 border-t border-slate-800">
+                <div class="bg-slate-950/80 border border-slate-800/60 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs text-slate-400 font-medium mb-1">Resistance Value</span>
+                    <span id="res-value" class="text-3xl font-extrabold text-blue-400 tracking-tight">100 Ω</span>
+                    <!-- Botão de Copiar para Pesquisa -->
+                    <button onclick="copyResistorInfo()" id="btn-copy" class="absolute top-3 right-3 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white p-2 rounded-xl border border-slate-800 transition-all cursor-pointer flex items-center gap-1.5 text-xs shadow-md" title="Copiar valor e tolerância para pesquisa">
+                        📋 <span id="copy-text" class="hidden sm:inline">Copiar</span>
+                    </button>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/60 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs text-slate-400 font-medium mb-1">Tolerance</span>
+                    <span id="res-tolerance" class="text-2xl font-bold text-emerald-400 tracking-tight">±5%</span>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800/60 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-xs text-slate-400 font-medium mb-1">Acceptable Range</span>
+                    <span id="res-range" class="text-lg font-bold text-amber-400 tracking-tight">95 Ω – 105 Ω</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls & Band Selectors Grid -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                Band Configuration Controls
+            </h3>
+
+            <div id="selectors-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Color Picker Modal Dialog -->
+    <div id="color-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-lg font-bold text-white">Select Color for Band</h3>
+                <button onclick="closeBandModal()" class="text-slate-400 hover:text-white bg-slate-800 p-2 rounded-xl transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">Click a color below to apply it to the selected band:</p>
+            <div id="modal-color-grid" class="grid grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1">
+                <!-- Dynamically populated options -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full bg-slate-900 border-t border-slate-800 py-6 px-6 text-center text-slate-500 text-xs">
+        <p>Resistor Color Code Calculator • Works 100% Offline • Built with Tailwind CSS & Vanilla JS</p>
+    </footer>
+
+    <script>
+        const COLOR_DATA = {
+            black:  { name: 'Black',  digit: 0, mult: 1,        tol: null, hex: '#1e293b', text: '#ffffff', border: '#475569' },
+            brown:  { name: 'Brown',  digit: 1, mult: 10,       tol: 1,    hex: '#78350f', text: '#ffffff', border: '#b45309' },
+            red:    { name: 'Red',    digit: 2, mult: 100,      tol: 2,    hex: '#dc2626', text: '#ffffff', border: '#f87171' },
+            orange: { name: 'Orange', digit: 3, mult: 1000,     tol: null, hex: '#ea580c', text: '#ffffff', border: '#fb923c' },
+            yellow: { name: 'Yellow', digit: 4, mult: 10000,    tol: null, hex: '#ca8a04', text: '#1e293b', border: '#facc15' },
+            green:  { name: 'Green',  digit: 5, mult: 100000,   tol: 0.5,  hex: '#16a34a', text: '#ffffff', border: '#4ade80' },
+            blue:   { name: 'Blue',   digit: 6, mult: 1000000,  tol: 0.25, hex: '#2563eb', text: '#ffffff', border: '#60a5fa' },
+            violet: { name: 'Violet', digit: 7, mult: 10000000, tol: 0.1,  hex: '#7c3aed', text: '#ffffff', border: '#a78bfa' },
+            grey:   { name: 'Grey',   digit: 8, mult: 100000000,tol: 0.05,hex: '#64748b', text: '#ffffff', border: '#94a3b8' },
+            white:  { name: 'White',  digit: 9, mult: 1000000000,tol: null,hex: '#f8fafc', text: '#1e293b', border: '#cbd5e1' },
+            gold:   { name: 'Gold',   digit: null, mult: 0.1,  tol: 5,    hex: '#d97706', text: '#ffffff', border: '#fbbf24' },
+            silver: { name: 'Silver', digit: null, mult: 0.01, tol: 10,   hex: '#94a3b8', text: '#1e293b', border: '#e2e8f0' }
+        };
+
+        const DIGIT_COLORS = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'grey', 'white'];
+        const MULT_COLORS = ['black', 'brown', 'red', 'orange', 'yellow', 'green', 'blue', 'violet', 'grey', 'white', 'gold', 'silver'];
+        const TOL_COLORS = ['brown', 'red', 'green', 'blue', 'violet', 'grey', 'gold', 'silver'];
+
+        const COMMON_RESISTORS = [
+            { label: '0.001 Ω (Shunt/Low)', numBands: 4, bands: ['black', 'black', 'silver', 'gold'] },
+            { label: '0.75 Ω', numBands: 5, bands: ['violet', 'green', 'silver', 'gold'] },
+            { label: '1 Ω', numBands: 4, bands: ['brown', 'black', 'black', 'gold'] },
+            { label: '1.2 Ω', numBands: 4, bands: ['brown', 'red', 'silver', 'gold'] },
+            { label: '4 Ω', numBands: 4, bands: ['yellow', 'black', 'silver', 'gold'] },
+            { label: '6 Ω', numBands: 4, bands: ['blue', 'black', 'silver', 'gold'] },
+            { label: '13 Ω', numBands: 4, bands: ['brown', 'orange', 'black', 'gold'] },
+            { label: '33 Ω', numBands: 4, bands: ['orange', 'orange', 'black', 'gold'] },
+            { label: '39 Ω', numBands: 4, bands: ['orange', 'white', 'black', 'gold'] },
+            { label: '220 Ω', numBands: 4, bands: ['red', 'red', 'brown', 'gold'] },
+            { label: '470 Ω', numBands: 4, bands: ['yellow', 'violet', 'brown', 'gold'] },
+            { label: '560 Ω', numBands: 4, bands: ['green', 'blue', 'brown', 'gold'] },
+            { label: '1 kΩ', numBands: 4, bands: ['brown', 'black', 'red', 'gold'] },
+            { label: '2 kΩ', numBands: 4, bands: ['red', 'black', 'red', 'gold'] },
+            { label: '4 kΩ', numBands: 4, bands: ['yellow', 'black', 'red', 'gold'] },
+            { label: '10 kΩ', numBands: 4, bands: ['brown', 'black', 'orange', 'gold'] },
+            { label: '15 kΩ', numBands: 4, bands: ['brown', 'green', 'orange', 'gold'] },
+            { label: '100 kΩ', numBands: 4, bands: ['brown', 'black', 'yellow', 'gold'] },
+            { label: '3.3 MΩ', numBands: 4, bands: ['orange', 'orange', 'green', 'gold'] }
+        ];
+
+        let numBands = 4;
+        let currentSelections = ['brown', 'black', 'brown', 'gold'];
+        let activeModalBandIndex = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            populatePresetDropdown();
+            updateUI();
+        });
+
+        function populatePresetDropdown() {
+            const select = document.getElementById('preset-select');
+            select.innerHTML = '<option value="" disabled selected>Valores Comuns...</option>';
+            COMMON_RESISTORS.forEach((item, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = item.label.split(' (')[0];
+                select.appendChild(opt);
+            });
+        }
+
+        function selectPreset(indexStr) {
+            const index = parseInt(indexStr);
+            if (isNaN(index)) return;
+            const preset = COMMON_RESISTORS[index];
+
+            // Define o número de bandas que este item específico possui
+            numBands = preset.numBands;
+            
+            // Copia as cores próprias deste item
+            currentSelections = [...preset.bands];
+
+            // Atualiza visualmente os botões do topo (4 Bands / 5 Bands) para refletir o item
+            if (numBands === 5) {
+                document.getElementById('btn-5band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md";
+                document.getElementById('btn-4band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+            } else {
+                document.getElementById('btn-4band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md";
+                document.getElementById('btn-5band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+            }
+
+            // Mantém a seleção no combobox
+            document.getElementById('preset-select').value = indexStr;
+            
+            // Atualiza a interface gráfica com as novas bandas
+            updateUI();
+        }
+
+        function reverseBands() {
+            currentSelections.reverse();
+            document.getElementById('preset-select').value = "";
+            updateUI();
+        }
+        
+        function setMode(bands) {
+            numBands = bands;
+            if (bands === 4) {
+                document.getElementById('btn-4band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md";
+                document.getElementById('btn-5band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+                currentSelections = ['brown', 'black', 'brown', 'gold'];
+            } else {
+                document.getElementById('btn-5band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all bg-blue-600 text-white shadow-md";
+                document.getElementById('btn-4band').className = "px-4 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-400 hover:text-white";
+                currentSelections = ['violet', 'green', 'black', 'orange','brown'];
+            }
+            document.getElementById('preset-select').value = "";
+            updateUI();
+        }
+
+        function getAvailableColorsForBand(index) {
+            if (numBands === 4) {
+                if (index === 0 || index === 1) return DIGIT_COLORS;
+                if (index === 2) return MULT_COLORS;
+                if (index === 3) return TOL_COLORS;
+            } else {
+                if (index >= 0 && index <= 2) return DIGIT_COLORS;
+                if (index === 3) return MULT_COLORS;
+                if (index === 4) return TOL_COLORS;
+            }
+            return DIGIT_COLORS;
+        }
+
+        function getBandLabelName(index) {
+            if (numBands === 4) {
+                return ['Digit 1', 'Digit 2', 'Multiplier', 'Tolerance'][index];
+            } else {
+                return ['Digit 1', 'Digit 2', 'Digit 3', 'Multiplier', 'Tolerance'][index];
+            }
+        }
+
+        function updateUI() {
+            const band2Group = document.getElementById('svg-band-2-group');
+            const band4Group = document.getElementById('svg-band-4-group');
+            const label0 = document.getElementById('svg-label-0');
+            const label1 = document.getElementById('svg-label-1');
+            const label2 = document.getElementById('svg-label-2');
+            const label3 = document.getElementById('svg-label-3');
+            const label4 = document.getElementById('svg-label-4');
+
+            if (numBands === 4) {
+                // Posicionamento simétrico para 4 bandas
+                // X coordinates: 280, 340, 420, 500
+                const coords = [280, 340, 420, 500];
+                
+                band2Group.style.display = 'block';
+                band4Group.style.display = 'none';
+
+                for (let i = 0; i < 4; i++) {
+                    const g = document.querySelectorAll('.band-group')[i];
+                    const rect = g.querySelector('rect');
+                    const hoverRect = g.querySelectorAll('rect')[1];
+                    const textEl = g.querySelector('text');
+
+                    rect.setAttribute('x', coords[i]);
+                    hoverRect.setAttribute('x', coords[i] - 2);
+                    textEl.setAttribute('x', coords[i] + 7);
+                    rect.setAttribute('fill', COLOR_DATA[currentSelections[i]].hex);
+                }
+
+                label0.textContent = 'B1';
+                label1.textContent = 'B2';
+                label2.textContent = 'Mult';
+                label3.textContent = 'Tol';
+            } else {
+                // Posicionamento simétrico para 5 bandas
+                // X coordinates: 260, 310, 360, 430, 510
+                const coords = [260, 310, 360, 430, 510];
+
+                band2Group.style.display = 'block';
+                band4Group.style.display = 'block';
+
+                for (let i = 0; i < 5; i++) {
+                    const g = document.querySelectorAll('.band-group')[i];
+                    const rect = g.querySelector('rect');
+                    const hoverRect = g.querySelectorAll('rect')[1];
+                    const textEl = g.querySelector('text');
+
+                    rect.setAttribute('x', coords[i]);
+                    hoverRect.setAttribute('x', coords[i] - 2);
+                    textEl.setAttribute('x', coords[i] + 7);
+                    rect.setAttribute('fill', COLOR_DATA[currentSelections[i]].hex);
+                }
+
+                label0.textContent = 'B1';
+                label1.textContent = 'B2';
+                label2.textContent = 'B3';
+                label3.textContent = 'Mult';
+                label4.textContent = 'Tol';
+            }
+
+            // Render selectors grid
+            const container = document.getElementById('selectors-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < numBands; i++) {
+                const colorKey = currentSelections[i];
+                const colorInfo = COLOR_DATA[colorKey];
+                const bandName = getBandLabelName(i);
+                const allowed = getAvailableColorsForBand(i);
+
+                const card = document.createElement('div');
+                card.className = "bg-slate-950 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between shadow-md";
+                
+                let htmlOptions = '';
+                allowed.forEach(cKey => {
+                    const cObj = COLOR_DATA[cKey];
+                    const selectedClass = cKey === colorKey ? 'ring-2 ring-blue-500 scale-105' : 'opacity-70 hover:opacity-100';
+                    htmlOptions += `<button onclick="setBandColor(${i}, '${cKey}')" class="flex items-center gap-2 p-2 rounded-xl bg-slate-900 hover:bg-slate-800 transition-all text-xs font-medium text-left border border-slate-800 ${selectedClass}">
+                        <span class="w-4 h-4 rounded-full shadow-inner shrink-0" style="background-color: ${cObj.hex}; border: 1px solid ${cObj.border}"></span>
+                        <span class="text-slate-200 truncate">${cObj.name}</span>
+                    </button>`;
+                });
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Band ${i+1}: ${bandName}</span>
+                        <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold text-white uppercase" style="background-color: ${colorInfo.hex}; border: 1px solid ${colorInfo.border}">${colorInfo.name}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-1">
+                        ${htmlOptions}
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+
+            calculateResistance();
+        }
+
+        function setBandColor(index, colorKey) {
+            currentSelections[index] = colorKey;
+            document.getElementById('preset-select').value = "";
+            updateUI();
+            closeBandModal();
+        }
+
+        function openBandModal(index) {
+            if (numBands === 4 && index >= 4) return;
+            activeModalBandIndex = index;
+            const bandName = getBandLabelName(index);
+            document.getElementById('modal-title').textContent = `Select Color for Band ${index + 1} (${bandName})`;
+
+            const grid = document.getElementById('modal-color-grid');
+            grid.innerHTML = '';
+            const allowed = getAvailableColorsForBand(index);
+            const currentColor = currentSelections[index];
+
+            allowed.forEach(cKey => {
+                const cObj = COLOR_DATA[cKey];
+                const isSelected = cKey === currentColor;
+                const btn = document.createElement('button');
+                btn.className = `flex items-center justify-between p-3 rounded-xl transition-all border ${isSelected ? 'bg-blue-600/20 border-blue-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'}`;
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-full shadow-md shrink-0" style="background-color: ${cObj.hex}; border: 1px solid ${cObj.border}"></span>
+                        <span class="font-medium text-sm">${cObj.name}</span>
+                    </div>
+                    ${isSelected ? '<span class="text-xs text-blue-400 font-bold">Selected</span>' : ''}
+                `;
+                btn.onclick = () => setBandColor(index, cKey);
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('color-modal').classList.remove('hidden');
+        }
+
+        function closeBandModal() {
+            document.getElementById('color-modal').classList.add('hidden');
+            activeModalBandIndex = null;
+        }
+
+        function formatResistance(ohms) {
+            if (ohms >= 1e9) return (ohms / 1e9).toFixed(ohms % 1e9 !== 0 ? 2 : 0) + ' GΩ';
+            if (ohms >= 1e6) return (ohms / 1e6).toFixed(ohms % 1e6 !== 0 ? 2 : 0) + ' MΩ';
+            if (ohms >= 1e3) return (ohms / 1e3).toFixed(ohms % 1e3 !== 0 ? 2 : 0) + ' kΩ';
+            return ohms.toFixed(ohms % 1 !== 0 ? 2 : 0) + ' Ω';
+        }
+
+        function calculateResistance() {
+            let ohms = 0;
+            let tolerance = 5;
+
+            if (numBands === 4) {
+                const d1 = COLOR_DATA[currentSelections[0]].digit ?? 0;
+                const d2 = COLOR_DATA[currentSelections[1]].digit ?? 0;
+                const mult = COLOR_DATA[currentSelections[2]].mult ?? 1;
+                tolerance = COLOR_DATA[currentSelections[3]].tol ?? 5;
+
+                ohms = (d1 * 10 + d2) * mult;
+            } else {
+                const d1 = COLOR_DATA[currentSelections[0]].digit ?? 0;
+                const d2 = COLOR_DATA[currentSelections[1]].digit ?? 0;
+                const d3 = COLOR_DATA[currentSelections[2]].digit ?? 0;
+                const mult = COLOR_DATA[currentSelections[3]].mult ?? 1;
+                tolerance = COLOR_DATA[currentSelections[4]].tol ?? 1;
+
+                ohms = (d1 * 100 + d2 * 10 + d3) * mult;
+            }
+
+            const minVal = ohms * (1 - tolerance / 100);
+            const maxVal = ohms * (1 + tolerance / 100);
+
+            document.getElementById('res-value').textContent = formatResistance(ohms);
+            document.getElementById('res-tolerance').textContent = `±${tolerance}%`;
+            document.getElementById('res-range').textContent = `${formatResistance(minVal)} – ${formatResistance(maxVal)}`;
+        }
+        function copyResistorInfo() {
+            const valueText = document.getElementById('res-value').textContent.trim();
+            const toleranceText = document.getElementById('res-tolerance').textContent.trim();
+            
+            // Pega apenas as cores ativas de acordo com o número de bandas atual (4 ou 5)
+            const activeColorsKeys = currentSelections.slice(0, numBands);
+            
+            // Aproveita diretamente o nome que já está no COLOR_DATA
+            const bandsColors = activeColorsKeys.map(key => COLOR_DATA[key]?.name || key);
+
+            // Formata o texto das faixas
+            const bandsString = bandsColors.length > 0 ? ` [Faixas: ${bandsColors.join(', ')}]` : '';
+
+            // Monta a string completa para cópia
+            const textToCopy = `Resistor ${valueText} ${toleranceText}${bandsString}`;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.getElementById('btn-copy');
+                if (!btn) return;
+                
+                const originalHTML = btn.innerHTML;
+                
+                // Feedback visual de sucesso
+                btn.innerHTML = '✅ <span class="hidden sm:inline">Copiado!</span>';
+                btn.classList.add('border-emerald-500/50', 'text-emerald-400');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('border-emerald-500/50', 'text-emerald-400');
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar texto: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

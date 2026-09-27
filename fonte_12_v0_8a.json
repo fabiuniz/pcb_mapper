@@ -1,0 +1,644 @@
+{
+  "identificacao_geral": {
+    "tipo_provavel": "Fonte de alimentação chaveada isolada",
+    "entrada": "110v AC",
+    "tensao": "12 V DC",
+    "corrente_nominal": "0,8 A",
+    "ferramentas": [
+      "Não tenho Osciloscópio",
+      "Multímetro Anegg sz08",
+      "Sugador",
+      "Fero de solda",
+      "Alicates, fendas ..."
+    ]
+  },
+  "Prompt_de_diagnostico": [
+    {
+      "sintomas_observados": [
+        "Tensão no primario 179 V",
+        "Provavelmente tensão contínua no barramento primário",
+        "Oscilando 9v ~12v",
+        "A saída cai para zero quando recebe carga",
+        "A saída volta após algumas tentativas",
+        "Depois de varias tentativa permanece em zero",
+        "Mas volta de 9v a 12v depois de um tempo",
+        "Mesmo removendo C7 e C15 continua os sintomas"
+      ],
+      "instrucao_para_o_ia": "Com base no JSON de mapeamento da placa e nas regras inegociáveis abaixo, execute um diagnóstico técnico impecável, cruzando absolutamente todas as medições inboard e offboard com ou sem corrente registradas, sem omitir nenhum componente, começando pelo teste.",
+      "prompt_de_diagnostico_rigoroso": {
+        "regras_inegociaveis": {
+          "1_leitura_integral_e_cruzamento": "Analise, cruze e cite obrigatoriamente TODAS as medições fornecidas (tanto inboard quanto offboard) e observações de cada componente mapeado no JSON. Nenhuma medição registrada pode ser esquecida ou tratada de forma isolada.",
+          "2_pontos_coordenadas": "Utilize a posição física e os pontos coordenadas de cada componente na placa para associar conexões físicas, trilhas e proximidades.",
+          "3_orientacao_da_placa": "Considere a imagem dividida verticalmente ao meio: o lado esquerdo contém os componentes e o lado direito contém a malha (trilhas/soldas).",
+          "4_omissao_de_componentes": "Se houver omissão de algum componente essencial para iniciar o diagnóstico, aponte-o explicitamente. Caso contrário, foque estritamente nos componentes que já possuem medições registradas no JSON.",
+          "5_base_exclusiva_nos_testes_feitos": "ATENÇÃO ABSOLUTA: Verifique o campo 'offboard' de cada componente antes de gerar a resposta. Se o campo offboard já possuir dados preenchidos, a peça JÁ FOI REMOVIDA E TESTADA — é estritamente proibido sugerir sua nova remoção ou novo isolamento. Utilize o dado offboard existente para avançar diretamente para o próximo componente da cadeia lógica.",
+          "6_passo_a_passo_com_ferramentas": "Ao sugerir qualquer novo teste válido (em peças que ainda não foram isoladas), forneça um passo a passo detalhado, prático e seguro, utilizando exclusivamente as ferramentas declaradas pelo usuário (Multímetro Anegg SZ08, ferro de solda, sugador, alicates, sem osciloscópio).",
+          "7_alertas_de_tags": "Informe explicitamente possíveis erros comuns ao etiquetar ou posicionar tags nos componentes (ex: inversão de polaridade em eletrolíticos, confusão em valores de resistores SMD ou mistura de malhas primária e secundária)."
+        }
+      }
+    }
+  ],
+  "componentes_mapeados": [
+    {
+      "id": "comp_q1",
+      "marcacao": "Q1",
+      "tipo": "MOSFET ou transistor de potência",
+      "especificacao": "Montado em dissipador",
+      "observacao": "medições:\ninboard: 11,73kΩ de um lado e 9,65kΩ do outro\nCom corrente (1 e 2 178v) e (3 e 2 175.2v)  e (1 e 3 0.3v)\n",
+      "coordenadas": {
+        "x": 0.6615,
+        "y": 0.3252,
+        "largura": 0.035,
+        "altura": 0.1136
+      }
+    },
+    {
+      "id": "comp_hs1",
+      "marcacao": "HS1",
+      "tipo": "Dissipador de calor",
+      "especificacao": "Alumínio",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.1772,
+        "y": 0.261,
+        "largura": 0.1579,
+        "altura": 0.2544
+      }
+    },
+    {
+      "id": "comp_c5",
+      "marcacao": "C5",
+      "tipo": "Capacitor",
+      "especificacao": "10 uF / 50 V",
+      "observacao": "medições:\ninboard: 11.5 uF, com corrente 0,5 v\noffboard: 9.6 uF",
+      "coordenadas": {
+        "x": 0.9175,
+        "y": 0.4189,
+        "largura": 0.0281,
+        "altura": 0.0439
+      }
+    },
+    {
+      "id": "comp_d2",
+      "marcacao": "D2",
+      "tipo": "Designador de diodo",
+      "especificacao": "Retificador do secundário",
+      "observacao": "medições:\noffboard: 57kΩ",
+      "coordenadas": {
+        "x": 0.8531,
+        "y": 0.1469,
+        "largura": 0.049,
+        "altura": 0.0455
+      }
+    },
+    {
+      "id": "comp_d4",
+      "marcacao": "C4",
+      "tipo": "Capacitor",
+      "especificacao": "50v 22 uF",
+      "observacao": "medições:\ninboard: ocilando 25 uF a 87 uF, com corrente 0 v \noffboard: 22 uF\n",
+      "coordenadas": {
+        "x": 0.8368,
+        "y": 0.3311,
+        "largura": 0.0421,
+        "altura": 0.0439
+      }
+    },
+    {
+      "id": "comp_d5",
+      "marcacao": "D5",
+      "tipo": "Diodo",
+      "especificacao": "Diodo",
+      "observacao": "medição:\ninboard: 54.1 kΩ",
+      "coordenadas": {
+        "x": 0.6053,
+        "y": 0.3268,
+        "largura": 0.0316,
+        "altura": 0.1075
+      }
+    },
+    {
+      "id": "comp_r3",
+      "marcacao": "R3",
+      "tipo": "Resistor smd",
+      "especificacao": "Resistor 204",
+      "observacao": "medições:\ninboard: 50kΩ",
+      "coordenadas": {
+        "x": 0.5263,
+        "y": 0.2917,
+        "largura": 0.0614,
+        "altura": 0.0329
+      }
+    },
+    {
+      "id": "comp_r6",
+      "marcacao": "R6",
+      "tipo": "Designador de resistor",
+      "especificacao": "Resistor 2000",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.7965,
+        "y": 0.3618,
+        "largura": 0.0397,
+        "altura": 0.0398
+      }
+    },
+    {
+      "id": "comp_r8",
+      "marcacao": "R8",
+      "tipo": "Designador de resistor",
+      "especificacao": "Resistor 301",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.9348,
+        "y": 0.334,
+        "largura": 0.027,
+        "altura": 0.0596
+      }
+    },
+    {
+      "id": "comp_r13",
+      "marcacao": "R13",
+      "tipo": "Resistor smd",
+      "especificacao": "Resistor 2001",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.9364,
+        "y": 0.6879,
+        "largura": 0.0493,
+        "altura": 0.0358
+      }
+    },
+    {
+      "id": "comp_r14",
+      "marcacao": "R14",
+      "tipo": "resistor smd",
+      "especificacao": "Resistor 2000",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.9348,
+        "y": 0.7356,
+        "largura": 0.0493,
+        "altura": 0.0358
+      }
+    },
+    {
+      "id": "comp_r19",
+      "marcacao": "R9",
+      "tipo": "Resistor smd",
+      "especificacao": "Parcialmente legível 472",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.8013,
+        "y": 0.8728,
+        "largura": 0.0238,
+        "altura": 0.0457
+      }
+    },
+    {
+      "id": "comp_b20",
+      "marcacao": "R21",
+      "tipo": "resistor smd",
+      "especificacao": "B20",
+      "observacao": "medições:\ninboard: 81,7kΩ",
+      "coordenadas": {
+        "x": 0.6211,
+        "y": 0.9189,
+        "largura": 0.0298,
+        "altura": 0.0461
+      }
+    },
+    {
+      "id": "comp_1787514066016",
+      "marcacao": "R4",
+      "tipo": "Resistor smd",
+      "especificacao": "Resistor 204",
+      "observacao": "medições:\ninboard: 50kΩ",
+      "coordenadas": {
+        "x": 0.5281,
+        "y": 0.3268,
+        "largura": 0.0579,
+        "altura": 0.0285
+      }
+    },
+    {
+      "id": "comp_1787515301007",
+      "marcacao": "C1",
+      "tipo": "Capacitor",
+      "especificacao": "400v 10 uF",
+      "observacao": "medições:\ninboard: 19 uF\ncom corrente mede 180v\noffboard: 9.9 uF",
+      "coordenadas": {
+        "x": 0.6797,
+        "y": 0.0524,
+        "largura": 0.0378,
+        "altura": 0.0927
+      }
+    },
+    {
+      "id": "comp_1787515364271",
+      "marcacao": "C3",
+      "tipo": "Capacitor",
+      "especificacao": "400v 10uv",
+      "observacao": "medições:\ninboard: 19.2 uF\ncom corrente mede 180v\noffboard: 9.4 uF",
+      "coordenadas": {
+        "x": 0.5329,
+        "y": 0.2255,
+        "largura": 0.0741,
+        "altura": 0.0612
+      }
+    },
+    {
+      "id": "comp_1787516665526",
+      "marcacao": "TU3",
+      "tipo": "Tranformador",
+      "especificacao": "RD240EE22 12V0.8A-1 WLK 0911 RD197-TW5",
+      "observacao": "medições:\ninboard:Na entrada esta entrando 179v mas na saida 0v\n\nIN  54321 entre 1 e 3 0,6\n    000X0\n    00X00\nOUT 67890 entre 2 e 4 0.4",
+      "coordenadas": {
+        "x": 0.6018,
+        "y": 0.5417,
+        "largura": 0.2404,
+        "altura": 0.2039
+      }
+    },
+    {
+      "id": "comp_1787517563095",
+      "marcacao": "R16",
+      "tipo": "resistor smd",
+      "especificacao": "9101",
+      "observacao": "mediação 3,7kΩ",
+      "coordenadas": {
+        "x": 0.9123,
+        "y": 0.943,
+        "largura": 0.0456,
+        "altura": 0.0285
+      }
+    },
+    {
+      "id": "comp_1787518200314",
+      "marcacao": "R7",
+      "tipo": "Resistor smd",
+      "especificacao": "754",
+      "observacao": "medições:\n:offboard: 140kΩ",
+      "coordenadas": {
+        "x": 0.7119,
+        "y": 0.465,
+        "largura": 0.0434,
+        "altura": 0.0262
+      }
+    },
+    {
+      "id": "comp_1787518256322",
+      "marcacao": "R5",
+      "tipo": "Resistor smd",
+      "especificacao": "221",
+      "observacao": "medições:\ninboard: 0,2",
+      "coordenadas": {
+        "x": 0.7147,
+        "y": 0.5122,
+        "largura": 0.0364,
+        "altura": 0.0245
+      }
+    },
+    {
+      "id": "comp_1787518304450",
+      "marcacao": "C11",
+      "tipo": "Capacitor",
+      "especificacao": "Cor beje",
+      "observacao": "medições:\ninboard: 3,2kΩ",
+      "coordenadas": {
+        "x": 0.9385,
+        "y": 0.7832,
+        "largura": 0.0448,
+        "altura": 0.0297
+      }
+    },
+    {
+      "id": "comp_1787518338401",
+      "marcacao": "R?",
+      "tipo": "Resistor ?",
+      "especificacao": "2321",
+      "observacao": "medições:\ninboard: 1,8kΩ",
+      "coordenadas": {
+        "x": 0.8392,
+        "y": 0.8007,
+        "largura": 0.035,
+        "altura": 0.0262
+      }
+    },
+    {
+      "id": "comp_1787518401785",
+      "marcacao": "C15",
+      "tipo": "Capacitor smd",
+      "especificacao": "16v 680 uF",
+      "observacao": "medições:\ninboard: 1.604 mF\n0.729 mF fora da placa",
+      "coordenadas": {
+        "x": 0.8427,
+        "y": 0.8333,
+        "largura": 0.0325,
+        "altura": 0.1175
+      }
+    },
+    {
+      "id": "comp_1787518461281",
+      "marcacao": "C?",
+      "tipo": "Capacitor smd",
+      "especificacao": "Cor beje",
+      "observacao": "1.864 mF",
+      "coordenadas": {
+        "x": 0.6211,
+        "y": 0.8268,
+        "largura": 0.0193,
+        "altura": 0.0504
+      }
+    },
+    {
+      "id": "comp_1787518541200",
+      "marcacao": "R11",
+      "tipo": "Resistor smd",
+      "especificacao": "0",
+      "observacao": "medições:\ninboard: 0,1kΩ",
+      "coordenadas": {
+        "x": 0.6965,
+        "y": 0.9496,
+        "largura": 0.0439,
+        "altura": 0.0219
+      }
+    },
+    {
+      "id": "comp_1787518591056",
+      "marcacao": "C8",
+      "tipo": "Capacitor smd",
+      "especificacao": "cor Beje",
+      "observacao": "medições:\ninboard: 3,2kΩ",
+      "coordenadas": {
+        "x": 0.9343,
+        "y": 0.8724,
+        "largura": 0.0182,
+        "altura": 0.0367
+      }
+    },
+    {
+      "id": "comp_1787518847742",
+      "marcacao": "I2",
+      "tipo": "Não especificado",
+      "especificacao": "ACT 308HT J9472",
+      "observacao": "medições:\ninboard: 13,06kΩ(pino 2 e 3) de um lado e 9,56kΩ(pino 1 e 2) do outro.\nCom corrente (1 e 2 0.4v) (1 e 3 0,3v)  (2 e 3 0v)",
+      "coordenadas": {
+        "x": 0.6643,
+        "y": 0.201,
+        "largura": 0.0909,
+        "altura": 0.042
+      }
+    },
+    {
+      "id": "comp_1787519047524",
+      "marcacao": "C7",
+      "tipo": "Capacitor smd",
+      "especificacao": "16v 680 uF",
+      "observacao": "medições:\ninboard: 1.591 mF\n0.691 mF fora da placa",
+      "coordenadas": {
+        "x": 0.6545,
+        "y": 0.8182,
+        "largura": 0.0224,
+        "altura": 0.0892
+      }
+    },
+    {
+      "id": "comp_1787521292724",
+      "marcacao": "U3",
+      "tipo": "Transistor",
+      "especificacao": "AZ431 AZ-AE1 945D92",
+      "observacao": "medições:\ninboard: 1,82kΩ(pino 1 e 2) e do outro lado 2,30kΩ(pino 2 e 3) com corrente (1 e 2 0k) (2 e 3 0k) (1 e 3 0k)",
+      "coordenadas": {
+        "x": 0.8596,
+        "y": 0.7522,
+        "largura": 0.0579,
+        "altura": 0.0461
+      }
+    },
+    {
+      "id": "comp_1787524806019",
+      "marcacao": "D4",
+      "tipo": "Designador de diodo",
+      "especificacao": "Retificador do secundário",
+      "observacao": "medições:\ninboard: 59,1kΩ",
+      "coordenadas": {
+        "x": 0.9594,
+        "y": 0.215,
+        "largura": 0.0182,
+        "altura": 0.0839
+      }
+    },
+    {
+      "id": "comp_1787524927402",
+      "marcacao": "D1",
+      "tipo": "Designador de diodo",
+      "especificacao": "Retificador do secundário",
+      "observacao": "medições:\ninboard: 55,4kΩ",
+      "coordenadas": {
+        "x": 0.8741,
+        "y": 0.1888,
+        "largura": 0.0601,
+        "altura": 0.0297
+      }
+    },
+    {
+      "id": "comp_1787525057433",
+      "marcacao": "D3",
+      "tipo": "Designador de diodo",
+      "especificacao": "Retificador do secundário",
+      "observacao": "medições:\ninboard: 58.8kΩ",
+      "coordenadas": {
+        "x": 0.7692,
+        "y": 0.1084,
+        "largura": 0.0196,
+        "altura": 0.0892
+      }
+    },
+    {
+      "id": "comp_1790429112041",
+      "marcacao": "R22",
+      "tipo": "Resistor",
+      "especificacao": "1 kΩ",
+      "observacao": "medições:\ninboard: 1 kΩ",
+      "coordenadas": {
+        "x": 0.8754,
+        "y": 0.4627,
+        "largura": 0.114,
+        "altura": 0.0351
+      }
+    },
+    {
+      "id": "comp_1790429926419",
+      "marcacao": "U2",
+      "tipo": "Optoacoplador",
+      "especificacao": "L0946 817 CN",
+      "observacao": "medições:\ninboard: 1.988 kΩ (pino 1 e 2) 13.70 MΩ (pino 3 e 4)\noffboard: não bipa e mede (pino 2 e 3 72MΩ ), pino (1 e 2 4MΩ)",
+      "coordenadas": {
+        "x": 0.9229,
+        "y": 0.5055,
+        "largura": 0.0578,
+        "altura": 0.1794
+      }
+    },
+    {
+      "id": "comp_1790454750046",
+      "marcacao": "D8",
+      "tipo": "Diodo",
+      "especificacao": "R303 R5",
+      "observacao": "medições:\ninboard:\noffboard:48 kΩ",
+      "coordenadas": {
+        "x": 0.5386,
+        "y": 0.818,
+        "largura": 0.0439,
+        "altura": 0.1513
+      }
+    },
+    {
+      "id": "comp_1790457151334",
+      "marcacao": "C14",
+      "tipo": "Capacitor",
+      "especificacao": "Ceramico C17 102M",
+      "observacao": "medições:\ninboard: 70 v com corrente\noffboard:",
+      "coordenadas": {
+        "x": 0.5351,
+        "y": 0.5461,
+        "largura": 0.0333,
+        "altura": 0.1974
+      }
+    },
+    {
+      "id": "comp_1790457212989",
+      "marcacao": "C12",
+      "tipo": "Capacitor",
+      "especificacao": "Ceramico C17 102M",
+      "observacao": "medições:\ninboard: 20 v com corrente\noffboard:",
+      "coordenadas": {
+        "x": 0.886,
+        "y": 0.5132,
+        "largura": 0.0316,
+        "altura": 0.1974
+      }
+    },
+    {
+      "id": "comp_1790457342140",
+      "marcacao": "C3",
+      "tipo": "Capacitor smd",
+      "especificacao": "Ceramico 1 kV 222",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.5281,
+        "y": 0.3684,
+        "largura": 0.0702,
+        "altura": 0.0307
+      }
+    },
+    {
+      "id": "comp_1790457421324",
+      "marcacao": "R2",
+      "tipo": "Resistor",
+      "especificacao": "750 kΩ",
+      "observacao": "medições:\ninboard: \noffboard:começou com 1 MΩ até chegar 780 kΩ",
+      "coordenadas": {
+        "x": 0.5246,
+        "y": 0.4561,
+        "largura": 0.093,
+        "altura": 0.0439
+      }
+    },
+    {
+      "id": "comp_1790511983843",
+      "marcacao": "J",
+      "tipo": "Entrada",
+      "especificacao": "110V",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.7579,
+        "y": 0,
+        "largura": 0.1737,
+        "altura": 0.0351
+      }
+    },
+    {
+      "id": "comp_1790512001683",
+      "marcacao": "J",
+      "tipo": "Saída",
+      "especificacao": "12v",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.9719,
+        "y": 0.8311,
+        "largura": 0.0228,
+        "altura": 0.1118
+      }
+    },
+    {
+      "id": "comp_1790513979751",
+      "marcacao": "RV1",
+      "tipo": "Varistor",
+      "especificacao": "TVR 10561*",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.8649,
+        "y": 0.068,
+        "largura": 0.0754,
+        "altura": 0.0789
+      }
+    },
+    {
+      "id": "comp_1790514130126",
+      "marcacao": "RT",
+      "tipo": "NTC",
+      "especificacao": "507",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.9439,
+        "y": 0.0789,
+        "largura": 0.0351,
+        "altura": 0.125
+      }
+    },
+    {
+      "id": "comp_1790514401508",
+      "marcacao": "F",
+      "tipo": "Fusivel",
+      "especificacao": "N/A",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.7754,
+        "y": 0.0417,
+        "largura": 0.0246,
+        "altura": 0.068
+      }
+    },
+    {
+      "id": "comp_1790515648260",
+      "marcacao": "L",
+      "tipo": "Bobina",
+      "especificacao": "N/A",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.5211,
+        "y": 0.011,
+        "largura": 0.0965,
+        "altura": 0.1623
+      }
+    },
+    {
+      "id": "comp_1790518411074",
+      "marcacao": "D",
+      "tipo": "Diodo Zener",
+      "especificacao": "N/A",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.7877,
+        "y": 0.4057,
+        "largura": 0.0825,
+        "altura": 0.0943
+      }
+    }
+  ],
+  "fonte_das_informacoes": {
+    "arquivo": "fonte_12_v0_8a_b.jpg"
+  }
+}

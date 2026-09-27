@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚡</text></svg>"/>
+    <title>PCB Mapper - Mapeador de Componentes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+        }
+        h1 { font-size: 1.4rem; text-align: center; }
+        h2 { color: #2c3e50; }
+        .container {
+            display: flex;
+            gap: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+            flex-direction: column; /* Padrão mobile-first para flex */
+        }
+        .editor-section {
+            flex: 2;
+            background: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .json-section {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .json-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .json-header h2 {
+            margin: 0;
+            color: #d4d4d4;
+            font-size: 1.1em;
+        }
+        .controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            cursor: crosshair;
+            margin-top: 10px;
+            border: 2px dashed #ccc;
+            overflow: hidden;
+            user-select: none; 
+            max-width: 100%;
+            width: 100%;
+        }
+        .canvas-container img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .shape-box {
+            position: absolute;
+            border: 2px solid;
+            cursor: move;
+            box-sizing: border-box;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .shape-box:hover, .shape-box.selected {
+            border-color: #2ecc71 !important;
+            background-color: rgba(46, 204, 113, 0.4) !important;
+        }
+        .shape-label {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 1px 3px;
+            border-radius: 3px;
+            pointer-events: none;
+            opacity: 0.8;
+            transition: opacity 0.2s, background 0.2s;
+        }
+        .shape-box:hover .shape-label {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        .resize-handle {
+            position: absolute;
+            right: -4px;
+            bottom: -4px;
+            width: 10px;
+            height: 10px;
+            background-color: #e74c3c;
+            border: 1px solid #fff;
+            cursor: nwse-resize;
+            border-radius: 50%;
+        }
+        #componentTooltip {
+            position: absolute;
+            display: none;
+            background: rgba(30, 30, 30, 0.95);
+            color: #fff;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-left: 4px solid #2ecc71;
+            max-width: 220px;
+        }
+        #componentTooltip b { color: #2ecc71; }
+        #svgOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        textarea {
+            width: 100%;
+            height: 250px;
+            background: #2d2d2d;
+            color: #9cdcfe;
+            border: none;
+            font-family: monospace;
+            padding: 8px;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        button, .btn-label {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            flex-grow: 1;
+            text-align: center;
+        }
+        button:hover, .btn-label:hover { background-color: #2980b9; }
+        .btn-success { background-color: #2ecc71; }
+        .btn-success:hover { background-color: #27ae60; }
+        .btn-danger { background-color: #e74c3c; }
+        .btn-danger:hover { background-color: #c0392b; }
+        input[type="file"] { display: none; }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 360px;
+            color: #333;
+            box-sizing: border-box;
+        }
+        .modal-content label { display: block; margin-top: 8px; font-weight: bold; font-size: 13px; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; font-family: Arial, sans-serif; height: auto; background: #fff; color: #333; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;}
+        .modal-buttons { margin-top: 12px; display: flex; justify-content: flex-end; gap: 6px; flex-wrap: wrap; }
+        .modal-buttons button { font-size: 11px; padding: 6px 10px; }
+
+        /* Responsividade para telas maiores (Desktop/Tablets) */
+        @media (min-width: 900px) {
+            body { padding: 20px; }
+            h1 { font-size: 2rem; }
+            .container { flex-direction: row; }
+            textarea { height: 450px; font-size: 13px; }
+            button, .btn-label { flex-grow: 0; font-size: 13px; padding: 8px 14px; }
+            .modal-content { max-width: 380px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>PCB Mapper - Mapeador Visual de Componentes</h1>
+    
+    <div class="container">
+        <div class="editor-section">
+            <div class="controls">
+                <label class="btn-label">📷 Imagem
+                    <input type="file" id="uploadImage" accept="image/*,.json" multiple>
+                </label>
+
+                <label class="btn-label" style="background-color: #9b59b6;">📂 JSON
+                    <input type="file" id="uploadJson" accept=".json">
+                </label>
+                <button id="rotateBtn" style="background-color: #e67e22;">🔄 Girar 90°</button>
+                <button id="saveBtn" class="btn-success">💾 Salvar</button>
+                <button id="clearBtn" class="btn-danger">🗑️ Limpar</button>
+            </div>            
+            <button id="configBtn" style="background-color: #34495e;">⚙️ Config. Gerais & Prompt</button>
+                <a href="resistor_calculator.html" target="_blank" class="btn-label" style="background-color: #8e44ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Calc. Resistor</a>
+                <a href="../eletronic/frontend/components.html" target="_blank" class="btn-label" style="background-color: #4e50ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Componentes</a>
+                
+            <p style="font-size: 11px; color: #666;"><i>Toque e arraste na imagem para criar shapes. Toque em um shape para editar.</i></p>
+            
+            <div class="canvas-container" id="canvasContainer">
+                <img id="sourceImage" src="" alt="Carregue uma imagem para começar">
+                
+                <svg id="svgOverlay">
+                    <line id="connectorLine" x1="0" y1="0" x2="0" y2="0" stroke="#2ecc71" stroke-width="2" stroke-dasharray="4" style="display:none;" />
+                </svg>
+
+                <div id="componentTooltip">
+                    <div id="tipTitle"><b>-</b></div>
+                    <div id="tipType">Tipo: -</div>
+                    <div id="tipValue">Valor: -</div>
+                    <div id="tipObs" style="margin-top: 4px; color: #f1c40f;">Obs: -</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="json-section">
+            <div class="json-header">
+                <h2>Estrutura JSON</h2>
+                <button id="copyJsonBtn" style="background-color: #2980b9; padding: 6px 10px; font-size: 11px;">📋 Copiar</button>
+            </div>
+            <textarea id="jsonOutput" readonly></textarea>
+        </div>
+    </div>
+
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3>Editar Componente</h3>
+            <label>Marcação (Ex: Q1, C3, R2):</label>
+            <input type="text" id="modalName">
+            
+            <label>Tipo / Função:</label>
+            <input type="text" id="modalType">
+
+            <label>Especificação / Valor:</label>
+            <input type="text" id="modalValue">
+
+            <label>Observação:</label>
+            <textarea id="modalObs" rows="3" style="resize: none;"></textarea>
+
+            <div class="modal-buttons">
+                <button id="modalDelete" class="btn-danger">Excluir</button>
+                <button id="modalClone" style="background-color: #f39c12;">Clonar</button>
+                <button id="modalCancel" style="background-color: #7f8c8d;">Cancelar</button>
+                <button id="modalSave" class="btn-success">Salvar</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="configModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3>Configurações Gerais & Prompt (JSON)</h3>
+            <p style="font-size: 11px; color: #666; margin-top: 0;">Edite abaixo a estrutura de identificação geral e os prompts de diagnóstico em formato JSON válido.</p>
+            
+            <label>Identificação Geral (JSON):</label>
+            <textarea id="configIdentificacaoJson" rows="6" style="font-family: monospace; font-size: 11px; background: #2d2d2d; color: #9cdcfe; resize: vertical;"></textarea>
+
+            <label style="margin-top: 10px;">Prompt de Diagnóstico (JSON Array/Object):</label>
+            <textarea id="configPromptJson" rows="8" style="font-family: monospace; font-size: 11px; background: #2d2d2d; color: #9cdcfe; resize: vertical;"></textarea>
+
+            <div class="modal-buttons">
+                <button id="configCancel" style="background-color: #7f8c8d;">Cancelar</button>
+                <button id="configSave" class="btn-success">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+<script>    
+    const modalClone = document.getElementById('modalClone');
+    const uploadImage = document.getElementById('uploadImage');
+    const uploadJson = document.getElementById('uploadJson');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const sourceImage = document.getElementById('sourceImage');
+    const canvasContainer = document.getElementById('canvasContainer');
+    const jsonOutput = document.getElementById('jsonOutput');
+    const saveBtn = document.getElementById('saveBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+
+    // Elementos do Modal de Configurações Gerais & Prompt
+    const configBtn = document.getElementById('configBtn');
+    const configModal = document.getElementById('configModal');
+    const configIdentificacaoJson = document.getElementById('configIdentificacaoJson');
+    const configPromptJson = document.getElementById('configPromptJson');
+    const configSave = document.getElementById('configSave');
+    const configCancel = document.getElementById('configCancel');
+
+    const editModal = document.getElementById('editModal');
+    const modalName = document.getElementById('modalName');
+    const modalType = document.getElementById('modalType');
+    const modalValue = document.getElementById('modalValue');
+    const modalObs = document.getElementById('modalObs');
+    const modalSave = document.getElementById('modalSave');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalDelete = document.getElementById('modalDelete');
+
+    const componentTooltip = document.getElementById('componentTooltip');
+    const connectorLine = document.getElementById('connectorLine');
+    const tipTitle = document.getElementById('tipTitle');
+    const tipType = document.getElementById('tipType');
+    const tipValue = document.getElementById('tipValue');
+    const tipObs = document.getElementById('tipObs');
+
+    let shapes = [];
+    let currentShape = null;
+    let isDrawing = false;
+    let startX = 0, startY = 0;
+    
+    let isDragging = false;
+    let isResizing = false;
+    let activeIndex = null;
+    let startMouseX = 0, startMouseY = 0;
+    let startBoxX = 0, startBoxY = 0, startBoxW = 0, startBoxH = 0;
+    let hasMoved = false;
+
+    let activeShapeIndex = null;
+    let currentImageName = "mapeamento_pcb";
+
+    let databaseJSON = {
+        "identificacao_geral": {
+            "tipo_provavel": "Placa Eletrônica / Circuito"
+        },
+        "componentes_mapeados": []
+    };
+
+    function getColorByPrefix(marcacao) {
+        if (!marcacao) return "#3498db"; 
+        const marcacaoLimpa = marcacao.trim().toUpperCase();
+        
+        // Tratamento para prefixos de 2 letras (como RV ou RT)
+        const prefix2 = marcacaoLimpa.substring(0, 2);
+        if (prefix2 === 'RV') return '#e84393'; // Varistor (Rosa)
+        if (prefix2 === 'RT') return '#00b894'; // Termistor NTC/PTC (Verde-água)
+        if (prefix2 === 'TH') return '#00b894'; // Termistor alternativo
+
+        const prefix = marcacaoLimpa.charAt(0);
+
+        switch (prefix) {
+            case 'R':  return '#e67e22';  // Resistor
+            case 'C':  return '#3498db';  // Capacitor
+            case 'Q':  return '#e74c3c';  // Transistor
+            case 'D':  return '#9b59b6';  // Diodo
+            case 'T':  return '#1abc9c';  // Transformador
+            case 'B':  return '#f1c40f';  // Bateria
+            case 'J':  return '#2980b9';  // Conector (Entrada / Saída)
+            case 'HS': return '#7f8c8d';  // Dissipador de Calor (Heat Sink)
+            case 'U':  return '#34495e';  // Circuito Integrado
+            case 'L':  return '#27ae60';  // Indutor / Bobina
+            case 'F':  return '#d35400';  // Fusível
+            case 'V':  return '#e84393';  // Varistor
+            default:   return '#95a5a6';  // Outros / Desconhecido
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        renderShapes();
+    });
+
+    uploadImage.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (!files.length) return;
+
+        let imageFile = null;
+        let jsonFile = null;
+
+        for (let file of files) {
+            if (file.type.startsWith('image/')) {
+                imageFile = file;
+            } else if (file.name.endsWith('.json')) {
+                jsonFile = file;
+            }
+        }
+
+        if (!imageFile && files[0].type.startsWith('image/')) {
+            imageFile = files[0];
+        }
+
+        if (imageFile) {
+            currentImageName = imageFile.name.substring(0, imageFile.name.lastIndexOf('.')) || "mapeamento_pcb";
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                sourceImage.src = event.target.result;
+                sourceImage.onload = () => renderShapes();
+                databaseJSON.fonte_das_informacoes = { "arquivo": imageFile.name };
+                updateJSONView();
+            }
+            reader.readAsDataURL(imageFile);
+        }
+
+        if (jsonFile) {
+            const jsonReader = new FileReader();
+            jsonReader.onload = function(event) {
+                try {
+                    const loadedData = JSON.parse(event.target.result);
+                    databaseJSON = loadedData;
+                    if (!databaseJSON.identificacao_geral) {
+                        databaseJSON.identificacao_geral = { "tipo_provavel": "Placa Eletrônica / Circuito" };
+                    }
+                    shapes = loadedData.componentes_mapeados || [];
+                    renderShapes();
+                    updateJSONView();
+                } catch (err) {
+                    console.error("Erro ao processar o JSON automático.");
+                }
+            };
+            jsonReader.readAsText(jsonFile);
+        }
+    });
+
+    uploadJson.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const loadedData = JSON.parse(event.target.result);
+                    databaseJSON = loadedData;
+                    if (!databaseJSON.identificacao_geral) {
+                        databaseJSON.identificacao_geral = { "tipo_provavel": "Placa Eletrônica / Circuito" };
+                    }
+                    shapes = loadedData.componentes_mapeados || [];
+                    renderShapes();
+                    updateJSONView();
+                } catch (err) {
+                    alert("Erro ao ler o arquivo JSON fornecido.");
+                }
+            };
+            reader.readAsText(file);
+        }
+    });
+
+    rotateBtn.addEventListener('click', () => {
+        if (!sourceImage.src || sourceImage.src === "") {
+            alert("Carregue uma imagem primeiro.");
+            return;
+        }
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = function() {
+            canvas.width = img.height;
+            canvas.height = img.width;
+
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(Math.PI / 2);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+            sourceImage.src = canvas.toDataURL();
+
+            shapes.forEach(shape => {
+                const x = shape.coordenadas.x;
+                const y = shape.coordenadas.y;
+                const w = shape.coordenadas.largura;
+                const h = shape.coordenadas.altura;
+
+                shape.coordenadas.x = Number((1.0 - (y + h)).toFixed(4));
+                shape.coordenadas.y = Number((x).toFixed(4));
+                shape.coordenadas.largura = Number((h).toFixed(4));
+                shape.coordenadas.altura = Number((w).toFixed(4));
+            });
+
+            databaseJSON.componentes_mapeados = shapes;
+            sourceImage.onload = () => renderShapes();
+        };
+        img.src = sourceImage.src;
+    });
+
+    saveBtn.addEventListener('click', () => {
+        const jsonString = JSON.stringify(databaseJSON, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `${currentImageName}.json`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    });
+
+    copyJsonBtn.addEventListener('click', () => {
+        const jsonString = jsonOutput.value;
+        if (!jsonString) return;
+
+        let optimizedJson;
+        try {
+            // Converte para objeto e depois para string sem formatação (minificado)
+            optimizedJson = JSON.stringify(JSON.parse(jsonString));
+        } catch (err) {
+            alert("O JSON inserido é inválido. Corrija a sintaxe antes de copiar.");
+            return;
+        }
+
+        navigator.clipboard.writeText(optimizedJson).then(() => {
+            // Opcional: Atualiza o campo visualmente com o JSON minificado
+            jsonOutput.value = optimizedJson;
+
+            const originalText = copyJsonBtn.innerText;
+            copyJsonBtn.innerText = "✅ Copiado (Otimizado)!";
+            copyJsonBtn.style.backgroundColor = "#2ecc71";
+            
+            setTimeout(() => {
+                copyJsonBtn.innerText = originalText;
+                copyJsonBtn.style.backgroundColor = "#2980b9";
+            }, 2000);
+        }).catch(err => {
+            alert("Erro ao copiar para a área de transferência.");
+        });
+    });
+
+    // Eventos do Modal de Configurações Gerais & Prompt
+    if (configBtn) {
+        configBtn.addEventListener('click', () => {
+            if (!databaseJSON.identificacao_geral) {
+                databaseJSON.identificacao_geral = { "tipo_provavel": "Placa Eletrônica / Circuito" };
+            }
+            configIdentificacaoJson.value = JSON.stringify(databaseJSON.identificacao_geral, null, 2);
+            configPromptJson.value = databaseJSON.Prompt_de_diagnostico ? JSON.stringify(databaseJSON.Prompt_de_diagnostico, null, 2) : "";
+            configModal.style.display = 'flex';
+        });
+    }
+
+    if (configSave) {
+        configSave.addEventListener('click', () => {
+            try {
+                databaseJSON.identificacao_geral = JSON.parse(configIdentificacaoJson.value);
+                
+                const promptVal = configPromptJson.value.trim();
+                if (promptVal !== "") {
+                    databaseJSON.Prompt_de_diagnostico = JSON.parse(promptVal);
+                } else {
+                    delete databaseJSON.Prompt_de_diagnostico;
+                }
+
+                updateJSONView();
+                configModal.style.display = 'none';
+            } catch (err) {
+                alert("Erro de sintaxe no JSON inserido. Verifique e tente novamente.\nDetalhes: " + err.message);
+            }
+        });
+    }
+
+    if (configCancel) {
+        configCancel.addEventListener('click', () => {
+            configModal.style.display = 'none';
+        });
+    }
+
+    // Eventos de toque/mouse unificados para melhor suporte mobile
+    canvasContainer.addEventListener('mousedown', (e) => {
+        if (e.target !== sourceImage && e.target !== canvasContainer) return;
+        
+        isDrawing = true;
+        const rect = sourceImage.getBoundingClientRect();
+        startX = e.clientX - rect.left;
+        startY = e.clientY - rect.top;
+
+        currentShape = document.createElement('div');
+        currentShape.className = 'shape-box';
+        currentShape.style.border = '2px solid #3498db';
+        currentShape.style.backgroundColor = 'rgba(52, 152, 219, 0.3)';
+        currentShape.style.left = `${startX}px`;
+        currentShape.style.top = `${startY}px`;
+        canvasContainer.appendChild(currentShape);
+    });
+
+    canvasContainer.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = sourceImage.getBoundingClientRect();
+        const currentX = e.clientX - rect.left;
+        const currentY = e.clientY - rect.top;
+
+        const width = currentX - startX;
+        const height = currentY - startY;
+
+        currentShape.style.width = `${Math.abs(width)}px`;
+        currentShape.style.height = `${Math.abs(height)}px`;
+        currentShape.style.left = `${width < 0 ? currentX : startX}px`;
+        currentShape.style.top = `${height < 0 ? currentY : startY}px`;
+    });
+
+    canvasContainer.addEventListener('mouseup', () => {
+        if (!isDrawing) return;
+        isDrawing = false;
+
+        const imgW = sourceImage.clientWidth;
+        const imgH = sourceImage.clientHeight;
+
+        const boxX = parseInt(currentShape.style.left);
+        const boxY = parseInt(currentShape.style.top);
+        const width = parseInt(currentShape.style.width);
+        const height = parseInt(currentShape.style.height);
+
+        if (isNaN(width) || isNaN(height) || width < 6 || height < 6) {
+            currentShape.remove();
+            return;
+        }
+
+        const newShapeData = {
+            id: "comp_" + Date.now(),
+            marcacao: "Novo",
+            tipo: "Não especificado",
+            especificacao: "N/A",
+            observacao: "",
+            coordenadas: {
+                x: Number((boxX / imgW).toFixed(4)),
+                y: Number((boxY / imgH).toFixed(4)),
+                largura: Number((width / imgW).toFixed(4)),
+                altura: Number((height / imgH).toFixed(4))
+            }
+        };
+
+        shapes.push(newShapeData);
+        databaseJSON.componentes_mapeados = shapes;
+        currentShape.remove();
+        
+        renderShapes();
+        openModal(shapes.length - 1);
+    });
+
+    window.addEventListener('mousemove', (ev) => {
+        if (activeIndex === null) return;
+        hasMoved = true;
+
+        const box = document.querySelector(`.shape-box[data-index="${activeIndex}"]`);
+        if (!box) return;
+
+        const dx = ev.clientX - startMouseX;
+        const dy = ev.clientY - startMouseY;
+
+        if (isDragging) {
+            let newX = startBoxX + dx;
+            let newY = startBoxY + dy;
+            if (newX < 0) newX = 0;
+            if (newY < 0) newY = 0;
+
+            box.style.left = `${newX}px`;
+            box.style.top = `${newY}px`;
+        } else if (isResizing) {
+            let newW = startBoxW + dx;
+            let newH = startBoxH + dy;
+            if (newW < 10) newW = 10;
+            if (newH < 10) newH = 10;
+
+            box.style.width = `${newW}px`;
+            box.style.height = `${newH}px`;
+        }
+    });
+
+    window.addEventListener('mouseup', () => {
+        if (activeIndex !== null) {
+            if (hasMoved) {
+                const box = document.querySelector(`.shape-box[data-index="${activeIndex}"]`);
+                const imgW = sourceImage.clientWidth;
+                const imgH = sourceImage.clientHeight;
+
+                shapes[activeIndex].coordenadas.x = Number((parseInt(box.style.left) / imgW).toFixed(4));
+                shapes[activeIndex].coordenadas.y = Number((parseInt(box.style.top) / imgH).toFixed(4));
+                shapes[activeIndex].coordenadas.largura = Number((parseInt(box.style.width) / imgW).toFixed(4));
+                shapes[activeIndex].coordenadas.altura = Number((parseInt(box.style.height) / imgH).toFixed(4));
+                updateJSONView();
+            }
+            isDragging = false;
+            isResizing = false;
+            activeIndex = null;
+        }
+    });
+
+    function renderShapes() {
+        document.querySelectorAll('.shape-box').forEach(el => el.remove());
+        if (!sourceImage.complete || sourceImage.clientWidth === 0) return;
+
+        const imgW = sourceImage.clientWidth;
+        const imgH = sourceImage.clientHeight;
+
+        shapes.forEach((shape, index) => {
+            const box = document.createElement('div');
+            box.className = 'shape-box';
+
+            const baseColor = getColorByPrefix(shape.marcacao);
+            box.style.borderColor = baseColor;
+            box.style.backgroundColor = baseColor + "33"; 
+
+            const pxX = shape.coordenadas.x * imgW;
+            const pxY = shape.coordenadas.y * imgH;
+            const pxW = shape.coordenadas.largura * imgW;
+            const pxH = shape.coordenadas.altura * imgH;
+
+            box.style.left = `${pxX}px`;
+            box.style.top = `${pxY}px`;
+            box.style.width = `${pxW}px`;
+            box.style.height = `${pxH}px`;
+            box.dataset.index = index;
+
+            const label = document.createElement('div');
+            label.className = 'shape-label';
+            label.style.backgroundColor = baseColor;
+            label.innerText = shape.marcacao;
+            box.appendChild(label);
+
+            const handle = document.createElement('div');
+            handle.className = 'resize-handle';
+            handle.addEventListener('mousedown', (ev) => {
+                ev.stopPropagation();
+                isResizing = true;
+                activeIndex = index;
+                hasMoved = false;
+                startMouseX = ev.clientX;
+                startMouseY = ev.clientY;
+                startBoxW = pxW;
+                startBoxH = pxH;
+            });
+            box.appendChild(handle);
+
+            box.addEventListener('mousedown', (ev) => {
+                ev.stopPropagation();
+                isDragging = true;
+                activeIndex = index;
+                hasMoved = false;
+                startMouseX = ev.clientX;
+                startMouseY = ev.clientY;
+                startBoxX = pxX;
+                startBoxY = pxY;
+            });
+
+            box.addEventListener('mouseenter', () => {
+                if (isDrawing || isDragging || isResizing) return;
+                
+                tipTitle.innerHTML = `Componente: <b>${shape.marcacao}</b>`;
+                tipType.innerText = `Tipo: ${shape.tipo || 'N/A'}`;
+                tipValue.innerText = `Valor: ${shape.especificacao || 'N/A'}`;
+                tipObs.innerText = `Obs: ${shape.observacao || 'Nenhuma'}`;
+                
+                componentTooltip.style.display = 'block';
+                connectorLine.style.display = 'block';
+
+                const centerX = pxX + pxW / 2;
+                const centerY = pxY + pxH / 2;
+
+                const containerWidth = canvasContainer.clientWidth;
+                let tipX = pxX + pxW + 20;
+                let tipY = pxY;
+
+                if (tipX + 220 > containerWidth) {
+                    tipX = pxX - 230;
+                    if (tipX < 10) tipX = 10;
+                }
+
+                componentTooltip.style.left = `${tipX}px`;
+                componentTooltip.style.top = `${tipY}px`;
+
+                const tooltipLeft = tipX;
+                const tooltipTop = tipY + 20;
+
+                connectorLine.setAttribute('x1', centerX);
+                connectorLine.setAttribute('y1', centerY);
+                connectorLine.setAttribute('x2', tooltipLeft > pxX ? tooltipLeft : tooltipLeft + 220);
+                connectorLine.setAttribute('y2', tooltipTop);
+            });
+
+            box.addEventListener('mouseleave', () => {
+                componentTooltip.style.display = 'none';
+                connectorLine.style.display = 'none';
+            });
+
+            box.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                if (!hasMoved) {
+                    openModal(index);
+                }
+            });
+
+            canvasContainer.appendChild(box);
+        });
+
+        updateJSONView();
+    }
+
+    function openModal(index) {
+        activeShapeIndex = index;
+        const shape = shapes[index];
+        modalName.value = shape.marcacao || "";
+        modalType.value = shape.tipo || "";
+        modalValue.value = shape.especificacao || "";
+        modalObs.value = shape.observacao || "";
+        editModal.style.display = 'flex';
+    }
+
+    modalSave.addEventListener('click', () => {
+        if (activeShapeIndex !== null) {
+            shapes[activeShapeIndex].marcacao = modalName.value;
+            shapes[activeShapeIndex].tipo = modalType.value;
+            shapes[activeShapeIndex].especificacao = modalValue.value;
+            shapes[activeShapeIndex].observacao = modalObs.value;
+            renderShapes();
+            closeModal();
+        }
+    });
+
+    modalDelete.addEventListener('click', () => {
+        if (activeShapeIndex !== null) {
+            shapes.splice(activeShapeIndex, 1);
+            databaseJSON.componentes_mapeados = shapes;
+            renderShapes();
+            closeModal();
+        }
+    });
+
+    modalCancel.addEventListener('click', closeModal);
+    function closeModal() { editModal.style.display = 'none'; activeShapeIndex = null; }
+
+    clearBtn.addEventListener('click', () => {
+        if (confirm("Limpar todos os componentes mapeados?")) {
+            shapes = [];
+            databaseJSON.componentes_mapeados = [];
+            renderShapes();
+        }
+    });
+
+    modalClone.addEventListener('click', () => {
+        if (activeShapeIndex !== null) {
+            const original = shapes[activeShapeIndex];
+            
+            const clonedShape = {
+                id: "comp_" + Date.now(),
+                marcacao: original.marcacao + "_copia",
+                tipo: original.tipo,
+                especificacao: original.especificacao,
+                observacao: original.observacao,
+                coordenadas: {
+                    x: Number((original.coordenadas.x + 0.02).toFixed(4)),
+                    y: Number((original.coordenadas.y + 0.02).toFixed(4)),
+                    largura: original.coordenadas.largura,
+                    altura: original.coordenadas.altura
+                }
+            };
+
+            shapes.push(clonedShape);
+            databaseJSON.componentes_mapeados = shapes;
+            
+            renderShapes();
+            closeModal();
+            openModal(shapes.length - 1);
+        }
+    });
+
+    function updateJSONView() {
+        jsonOutput.value = JSON.stringify(databaseJSON, null, 2);
+    }
+
+    updateJSONView();
+</script>
+</body>
+</html>
