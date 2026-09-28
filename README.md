@@ -1,5 +1,5 @@
 <!--
-Label: 🚀 [PCB Mapper]: Sistema de Diagnóstico e Reparo de Circuitos Eletrônicos Assistido por IA
+Label: 🚀 PCB Mapper, Sistema de Diagnóstico e Reparo de Circuitos Eletrônicos Assistido por IA
 Description: [uma Descrição do projeto]: Desenvolvimento de uma plataforma web avançada para mapeamento de PCBs, análise de esquemas e suporte ao diagnóstico e reparo de circuitos eletrônicos com auxílio de Inteligência Artificial, contando com ferramentas auxiliares de cálculo.
 technical_requirement: [os requerimetos]: Diagnóstico de Falhas, Engenharia Reversa de Hardware, Análise de Circuitos, Manipulação de JSON, Lógica de Programação.
 skills: [as competências]: Resolução de Problemas, Pensamento Crítico e Análise, Diagnóstico e Manutenção de Equipamentos, Aprendizado Contínuo.

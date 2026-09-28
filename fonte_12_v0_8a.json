@@ -6,6 +6,7 @@
     "corrente_nominal": "0,8 A",
     "ferramentas": [
       "Não tenho Osciloscópio",
+      "lâmpada incandescente de 60–100 W em série como limitador",
       "Multímetro Anegg sz08",
       "Sugador",
       "Fero de solda",
@@ -42,14 +43,14 @@
     {
       "id": "comp_q1",
       "marcacao": "Q1",
-      "tipo": "MOSFET ou transistor de potência",
-      "especificacao": "Montado em dissipador",
+      "tipo": "MOSFET Transistor de Potência NPN",
+      "especificacao": "MJE 813 1300 3",
       "observacao": "medições:\ninboard: 11,73kΩ de um lado e 9,65kΩ do outro\nCom corrente (1 e 2 178v) e (3 e 2 175.2v)  e (1 e 3 0.3v)\n",
       "coordenadas": {
-        "x": 0.6615,
-        "y": 0.3252,
-        "largura": 0.035,
-        "altura": 0.1136
+        "x": 0.6633,
+        "y": 0.324,
+        "largura": 0.0349,
+        "altura": 0.1121
       }
     },
     {
@@ -122,25 +123,25 @@
       "marcacao": "R3",
       "tipo": "Resistor smd",
       "especificacao": "Resistor 204",
-      "observacao": "medições:\ninboard: 50kΩ",
+      "observacao": "medições:\ninboard: 98.1kΩ",
       "coordenadas": {
-        "x": 0.5263,
+        "x": 0.5246,
         "y": 0.2917,
-        "largura": 0.0614,
+        "largura": 0.0596,
         "altura": 0.0329
       }
     },
     {
       "id": "comp_r6",
       "marcacao": "R6",
-      "tipo": "Designador de resistor",
+      "tipo": "Resistor smd",
       "especificacao": "Resistor 2000",
-      "observacao": "medições:\ninboard:\noffboard:",
+      "observacao": "medições:\ninboard:700kΩ\noffboard:",
       "coordenadas": {
         "x": 0.7965,
-        "y": 0.3618,
-        "largura": 0.0397,
-        "altura": 0.0398
+        "y": 0.3596,
+        "largura": 0.0386,
+        "altura": 0.0395
       }
     },
     {
@@ -148,7 +149,7 @@
       "marcacao": "R8",
       "tipo": "Designador de resistor",
       "especificacao": "Resistor 301",
-      "observacao": "medições:\ninboard:\noffboard:",
+      "observacao": "medições:\ninboard: 297 Ω\noffboard:",
       "coordenadas": {
         "x": 0.9348,
         "y": 0.334,
@@ -161,7 +162,7 @@
       "marcacao": "R13",
       "tipo": "Resistor smd",
       "especificacao": "Resistor 2001",
-      "observacao": "medições:\ninboard:\noffboard:",
+      "observacao": "medições:\ninboard:1.9kΩ\noffboard:",
       "coordenadas": {
         "x": 0.9364,
         "y": 0.6879,
@@ -174,7 +175,7 @@
       "marcacao": "R14",
       "tipo": "resistor smd",
       "especificacao": "Resistor 2000",
-      "observacao": "medições:\ninboard:\noffboard:",
+      "observacao": "medições:\ninboard:9.9kΩ\noffboard:",
       "coordenadas": {
         "x": 0.9348,
         "y": 0.7356,
@@ -187,7 +188,7 @@
       "marcacao": "R9",
       "tipo": "Resistor smd",
       "especificacao": "Parcialmente legível 472",
-      "observacao": "medições:\ninboard:\noffboard:",
+      "observacao": "medições:\ninboard:3.25kΩ\noffboard:",
       "coordenadas": {
         "x": 0.8013,
         "y": 0.8728,
@@ -200,7 +201,7 @@
       "marcacao": "R21",
       "tipo": "resistor smd",
       "especificacao": "B20",
-      "observacao": "medições:\ninboard: 81,7kΩ",
+      "observacao": "medições:\ninboard: 0,8kΩ",
       "coordenadas": {
         "x": 0.6211,
         "y": 0.9189,
@@ -213,7 +214,7 @@
       "marcacao": "R4",
       "tipo": "Resistor smd",
       "especificacao": "Resistor 204",
-      "observacao": "medições:\ninboard: 50kΩ",
+      "observacao": "medições:\ninboard:93.3kΩ",
       "coordenadas": {
         "x": 0.5281,
         "y": 0.3268,
@@ -252,7 +253,7 @@
       "marcacao": "TU3",
       "tipo": "Tranformador",
       "especificacao": "RD240EE22 12V0.8A-1 WLK 0911 RD197-TW5",
-      "observacao": "medições:\ninboard:Na entrada esta entrando 179v mas na saida 0v\n\nIN  54321 entre 1 e 3 0,6\n    000X0\n    00X00\nOUT 67890 entre 2 e 4 0.4",
+      "observacao": "medições:\ninboard: Com corrente na entrada esta entrando 179v mas na saida 0v\noffboard:\n12345 IN pinos(1 e 2 = 1,7Ω, 3 e 5 = 0.6Ω)\n000X0\n00X00\n67890 OUT pinos(8 e 0 = 0.3Ω)\nPara efeito de teste isolando curto no secundario ",
       "coordenadas": {
         "x": 0.6018,
         "y": 0.5417,
@@ -265,7 +266,7 @@
       "marcacao": "R16",
       "tipo": "resistor smd",
       "especificacao": "9101",
-      "observacao": "mediação 3,7kΩ",
+      "observacao": "mediação 3,3kΩ",
       "coordenadas": {
         "x": 0.9123,
         "y": 0.943,
@@ -278,7 +279,7 @@
       "marcacao": "R7",
       "tipo": "Resistor smd",
       "especificacao": "754",
-      "observacao": "medições:\n:offboard: 140kΩ",
+      "observacao": "medições:\n:offboard: 450kΩ",
       "coordenadas": {
         "x": 0.7119,
         "y": 0.465,
@@ -291,7 +292,7 @@
       "marcacao": "R5",
       "tipo": "Resistor smd",
       "especificacao": "221",
-      "observacao": "medições:\ninboard: 0,2",
+      "observacao": "medições:\ninboard: 15,8kΩ",
       "coordenadas": {
         "x": 0.7147,
         "y": 0.5122,
@@ -340,10 +341,10 @@
     },
     {
       "id": "comp_1787518461281",
-      "marcacao": "C?",
-      "tipo": "Capacitor smd",
+      "marcacao": "R?",
+      "tipo": "Resistor smd",
       "especificacao": "Cor beje",
-      "observacao": "1.864 mF",
+      "observacao": "Medições:\ninbound: 6.8 kΩ",
       "coordenadas": {
         "x": 0.6211,
         "y": 0.8268,
@@ -356,7 +357,7 @@
       "marcacao": "R11",
       "tipo": "Resistor smd",
       "especificacao": "0",
-      "observacao": "medições:\ninboard: 0,1kΩ",
+      "observacao": "medições:\ninboard: 0,11kΩ",
       "coordenadas": {
         "x": 0.6965,
         "y": 0.9496,
@@ -369,7 +370,7 @@
       "marcacao": "C8",
       "tipo": "Capacitor smd",
       "especificacao": "cor Beje",
-      "observacao": "medições:\ninboard: 3,2kΩ",
+      "observacao": "medições:\ninboard: 1.588kΩ",
       "coordenadas": {
         "x": 0.9343,
         "y": 0.8724,
@@ -380,14 +381,14 @@
     {
       "id": "comp_1787518847742",
       "marcacao": "I2",
-      "tipo": "Não especificado",
+      "tipo": "Transistor/Componente Auxiliar em TO-92",
       "especificacao": "ACT 308HT J9472",
       "observacao": "medições:\ninboard: 13,06kΩ(pino 2 e 3) de um lado e 9,56kΩ(pino 1 e 2) do outro.\nCom corrente (1 e 2 0.4v) (1 e 3 0,3v)  (2 e 3 0v)",
       "coordenadas": {
-        "x": 0.6643,
-        "y": 0.201,
-        "largura": 0.0909,
-        "altura": 0.042
+        "x": 0.6614,
+        "y": 0.1996,
+        "largura": 0.0895,
+        "altura": 0.0417
       }
     },
     {
@@ -605,8 +606,8 @@
       "especificacao": "N/A",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.7754,
-        "y": 0.0417,
+        "x": 0.786,
+        "y": 0.0241,
         "largura": 0.0246,
         "altura": 0.068
       }
