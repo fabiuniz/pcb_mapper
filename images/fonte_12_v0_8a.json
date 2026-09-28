@@ -60,10 +60,10 @@
       "especificacao": "Alumínio",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.1772,
-        "y": 0.261,
-        "largura": 0.1579,
-        "altura": 0.2544
+        "x": 0.1611,
+        "y": 0.2691,
+        "largura": 0.1646,
+        "altura": 0.2691
       }
     },
     {
@@ -73,10 +73,10 @@
       "especificacao": "10 uF / 50 V",
       "observacao": "medições:\ninboard: 11.5 uF, com corrente 0,5 v\noffboard: 9.6 uF",
       "coordenadas": {
-        "x": 0.9175,
-        "y": 0.4189,
-        "largura": 0.0281,
-        "altura": 0.0439
+        "x": 0.9057,
+        "y": 0.4076,
+        "largura": 0.0606,
+        "altura": 0.0434
       }
     },
     {
@@ -86,10 +86,10 @@
       "especificacao": "Retificador do secundário",
       "observacao": "medições:\noffboard: 57kΩ",
       "coordenadas": {
-        "x": 0.8531,
-        "y": 0.1469,
-        "largura": 0.049,
-        "altura": 0.0455
+        "x": 0.8328,
+        "y": 0.1527,
+        "largura": 0.0774,
+        "altura": 0.0378
       }
     },
     {
@@ -112,10 +112,10 @@
       "especificacao": "Diodo",
       "observacao": "medição:\ninboard: 54.1 kΩ",
       "coordenadas": {
-        "x": 0.6053,
-        "y": 0.3268,
-        "largura": 0.0316,
-        "altura": 0.1075
+        "x": 0.6139,
+        "y": 0.3277,
+        "largura": 0.0314,
+        "altura": 0.1064
       }
     },
     {
@@ -125,10 +125,10 @@
       "especificacao": "Resistor 204",
       "observacao": "medições:\ninboard: 98.1kΩ",
       "coordenadas": {
-        "x": 0.5246,
-        "y": 0.2917,
-        "largura": 0.0596,
-        "altura": 0.0329
+        "x": 0.532,
+        "y": 0.2955,
+        "largura": 0.0595,
+        "altura": 0.0322
       }
     },
     {
@@ -151,10 +151,10 @@
       "especificacao": "Resistor 301",
       "observacao": "medições:\ninboard: 297 Ω\noffboard:",
       "coordenadas": {
-        "x": 0.9348,
-        "y": 0.334,
-        "largura": 0.027,
-        "altura": 0.0596
+        "x": 0.9383,
+        "y": 0.3375,
+        "largura": 0.0269,
+        "altura": 0.0588
       }
     },
     {
@@ -216,10 +216,10 @@
       "especificacao": "Resistor 204",
       "observacao": "medições:\ninboard:93.3kΩ",
       "coordenadas": {
-        "x": 0.5281,
-        "y": 0.3268,
-        "largura": 0.0579,
-        "altura": 0.0285
+        "x": 0.532,
+        "y": 0.3333,
+        "largura": 0.0561,
+        "altura": 0.0266
       }
     },
     {
@@ -229,10 +229,10 @@
       "especificacao": "400v 10 uF",
       "observacao": "medições:\ninboard: 19 uF\ncom corrente mede 180v\noffboard: 9.9 uF",
       "coordenadas": {
-        "x": 0.6797,
-        "y": 0.0524,
-        "largura": 0.0378,
-        "altura": 0.0927
+        "x": 0.6835,
+        "y": 0.0392,
+        "largura": 0.0303,
+        "altura": 0.1078
       }
     },
     {
@@ -242,10 +242,10 @@
       "especificacao": "400v 10uv",
       "observacao": "medições:\ninboard: 19.2 uF\ncom corrente mede 180v\noffboard: 9.4 uF",
       "coordenadas": {
-        "x": 0.5329,
-        "y": 0.2255,
+        "x": 0.532,
+        "y": 0.2437,
         "largura": 0.0741,
-        "altura": 0.0612
+        "altura": 0.0504
       }
     },
     {
@@ -315,8 +315,8 @@
     },
     {
       "id": "comp_1787518338401",
-      "marcacao": "R?",
-      "tipo": "Resistor ?",
+      "marcacao": "R17",
+      "tipo": "Resistor smd",
       "especificacao": "2321",
       "observacao": "medições:\ninboard: 1,8kΩ",
       "coordenadas": {
@@ -359,10 +359,10 @@
       "especificacao": "0",
       "observacao": "medições:\ninboard: 0,11kΩ",
       "coordenadas": {
-        "x": 0.6965,
-        "y": 0.9496,
-        "largura": 0.0439,
-        "altura": 0.0219
+        "x": 0.6947,
+        "y": 0.9566,
+        "largura": 0.0438,
+        "altura": 0.021
       }
     },
     {
@@ -372,10 +372,10 @@
       "especificacao": "cor Beje",
       "observacao": "medições:\ninboard: 1.588kΩ",
       "coordenadas": {
-        "x": 0.9343,
-        "y": 0.8724,
-        "largura": 0.0182,
-        "altura": 0.0367
+        "x": 0.9349,
+        "y": 0.8557,
+        "largura": 0.0157,
+        "altura": 0.0476
       }
     },
     {
@@ -385,10 +385,10 @@
       "especificacao": "ACT 308HT J9472",
       "observacao": "medições:\ninboard: 13,06kΩ(pino 2 e 3) de um lado e 9,56kΩ(pino 1 e 2) do outro.\nCom corrente (1 e 2 0.4v) (1 e 3 0,3v)  (2 e 3 0v)",
       "coordenadas": {
-        "x": 0.6614,
-        "y": 0.1996,
-        "largura": 0.0895,
-        "altura": 0.0417
+        "x": 0.6611,
+        "y": 0.1989,
+        "largura": 0.0965,
+        "altura": 0.042
       }
     },
     {
@@ -411,10 +411,10 @@
       "especificacao": "AZ431 AZ-AE1 945D92",
       "observacao": "medições:\ninboard: 1,82kΩ(pino 1 e 2) e do outro lado 2,30kΩ(pino 2 e 3) com corrente (1 e 2 0k) (2 e 3 0k) (1 e 3 0k)",
       "coordenadas": {
-        "x": 0.8596,
-        "y": 0.7522,
-        "largura": 0.0579,
-        "altura": 0.0461
+        "x": 0.8631,
+        "y": 0.7423,
+        "largura": 0.0629,
+        "altura": 0.0532
       }
     },
     {
@@ -424,10 +424,10 @@
       "especificacao": "Retificador do secundário",
       "observacao": "medições:\ninboard: 59,1kΩ",
       "coordenadas": {
-        "x": 0.9594,
-        "y": 0.215,
-        "largura": 0.0182,
-        "altura": 0.0839
+        "x": 0.9562,
+        "y": 0.2199,
+        "largura": 0.0236,
+        "altura": 0.0952
       }
     },
     {
@@ -437,10 +437,10 @@
       "especificacao": "Retificador do secundário",
       "observacao": "medições:\ninboard: 55,4kΩ",
       "coordenadas": {
-        "x": 0.8741,
-        "y": 0.1888,
-        "largura": 0.0601,
-        "altura": 0.0297
+        "x": 0.8597,
+        "y": 0.1919,
+        "largura": 0.1021,
+        "altura": 0.0322
       }
     },
     {
@@ -450,10 +450,10 @@
       "especificacao": "Retificador do secundário",
       "observacao": "medições:\ninboard: 58.8kΩ",
       "coordenadas": {
-        "x": 0.7692,
-        "y": 0.1084,
-        "largura": 0.0196,
-        "altura": 0.0892
+        "x": 0.7688,
+        "y": 0.1078,
+        "largura": 0.0213,
+        "altura": 0.1373
       }
     },
     {
@@ -476,10 +476,10 @@
       "especificacao": "L0946 817 CN",
       "observacao": "medições:\ninboard: 1.988 kΩ (pino 1 e 2) 13.70 MΩ (pino 3 e 4)\noffboard: não bipa e mede (pino 2 e 3 72MΩ ), pino (1 e 2 4MΩ)",
       "coordenadas": {
-        "x": 0.9229,
-        "y": 0.5055,
-        "largura": 0.0578,
-        "altura": 0.1794
+        "x": 0.9304,
+        "y": 0.5042,
+        "largura": 0.0572,
+        "altura": 0.1793
       }
     },
     {
@@ -489,9 +489,9 @@
       "especificacao": "R303 R5",
       "observacao": "medições:\ninboard:\noffboard:48 kΩ",
       "coordenadas": {
-        "x": 0.5386,
-        "y": 0.818,
-        "largura": 0.0439,
+        "x": 0.523,
+        "y": 0.8039,
+        "largura": 0.0438,
         "altura": 0.1513
       }
     },
@@ -528,10 +528,10 @@
       "especificacao": "Ceramico 1 kV 222",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.5281,
-        "y": 0.3684,
-        "largura": 0.0702,
-        "altura": 0.0307
+        "x": 0.5297,
+        "y": 0.3683,
+        "largura": 0.0696,
+        "altura": 0.028
       }
     },
     {
@@ -580,10 +580,10 @@
       "especificacao": "TVR 10561*",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.8649,
-        "y": 0.068,
-        "largura": 0.0754,
-        "altura": 0.0789
+        "x": 0.8664,
+        "y": 0.0518,
+        "largura": 0.0752,
+        "altura": 0.0784
       }
     },
     {
@@ -594,9 +594,9 @@
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
         "x": 0.9439,
-        "y": 0.0789,
-        "largura": 0.0351,
-        "altura": 0.125
+        "y": 0.0784,
+        "largura": 0.0348,
+        "altura": 0.1345
       }
     },
     {
@@ -606,10 +606,10 @@
       "especificacao": "N/A",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.786,
-        "y": 0.0241,
-        "largura": 0.0246,
-        "altura": 0.068
+        "x": 0.7935,
+        "y": 0.0098,
+        "largura": 0.0247,
+        "altura": 0.1176
       }
     },
     {
@@ -619,10 +619,10 @@
       "especificacao": "N/A",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.5211,
-        "y": 0.011,
-        "largura": 0.0965,
-        "altura": 0.1623
+        "x": 0.5219,
+        "y": 0.0266,
+        "largura": 0.0943,
+        "altura": 0.1331
       }
     },
     {
@@ -632,10 +632,75 @@
       "especificacao": "N/A",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
-        "x": 0.7877,
-        "y": 0.4057,
-        "largura": 0.0825,
-        "altura": 0.0943
+        "x": 0.7868,
+        "y": 0.4048,
+        "largura": 0.0673,
+        "altura": 0.0336
+      }
+    },
+    {
+      "id": "comp_1790633030487",
+      "marcacao": "JP",
+      "tipo": "Jumper",
+      "especificacao": "N/A",
+      "observacao": "",
+      "coordenadas": {
+        "x": 0.5219,
+        "y": 0.7549,
+        "largura": 0.1751,
+        "altura": 0.0238
+      }
+    },
+    {
+      "id": "comp_1790633093374",
+      "marcacao": "JP",
+      "tipo": "Jumper",
+      "especificacao": "N/A",
+      "observacao": "",
+      "coordenadas": {
+        "x": 0.743,
+        "y": 0.8081,
+        "largura": 0.0269,
+        "altura": 0.1401
+      }
+    },
+    {
+      "id": "comp_1790633564402",
+      "marcacao": "D",
+      "tipo": "Diodo Zener",
+      "especificacao": "N/A",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.8002,
+        "y": 0.465,
+        "largura": 0.0662,
+        "altura": 0.0322
+      }
+    },
+    {
+      "id": "comp_1790633620785",
+      "marcacao": "D",
+      "tipo": "Diodo Zener",
+      "especificacao": "N/A",
+      "observacao": "medições:\ninboard:\noffboard:",
+      "coordenadas": {
+        "x": 0.8698,
+        "y": 0.3683,
+        "largura": 0.0236,
+        "altura": 0.0868
+      }
+    },
+    {
+      "id": "comp_1790633738984",
+      "marcacao": "JP",
+      "tipo": "Jumper",
+      "especificacao": "N/A",
+      "observacao": "",
+      "coordenadas": {
+        "x": 0.5253,
+        "y": 0.1667,
+        "largura": 0.1201,
+        "altura": 0.0294
       }
     }
   ],

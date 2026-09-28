@@ -136,6 +136,47 @@
             pointer-events: none;
             z-index: 999;
         }
+        .components-summary-section {
+                    margin-top: 15px;
+                    background: #252526;
+                    color: #d4d4d4;
+                    padding: 12px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    font-size: 12px;
+                }
+                .components-summary-section h3 {
+                    margin: 0 0 10px 0;
+                    color: #d4d4d4;
+                    font-size: 1.1em;
+                    border-bottom: 1px solid #3e3e42;
+                    padding-bottom: 5px;
+                }
+                .summary-grid {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                    max-height: 150px;
+                    overflow-y: auto;
+                }
+                .summary-badge {
+                    background: #333337;
+                    border: 1px solid #3e3e42;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-family: monospace;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .summary-badge span {
+                    background: #007acc;
+                    color: white;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                }
         textarea {
             width: 100%;
             height: 250px;
@@ -205,36 +246,30 @@
     </style>
 </head>
 <body>
-
     <h1>PCB Mapper - Mapeador Visual de Componentes</h1>
-    
     <div class="container">
         <div class="editor-section">
             <div class="controls">
                 <label class="btn-label">📷 Imagem
                     <input type="file" id="uploadImage" accept="image/*,.json" multiple>
                 </label>
-
                 <label class="btn-label" style="background-color: #9b59b6;">📂 JSON
                     <input type="file" id="uploadJson" accept=".json">
                 </label>
                 <button id="rotateBtn" style="background-color: #e67e22;">🔄 Girar 90°</button>
                 <button id="saveBtn" class="btn-success">💾 Salvar</button>
                 <button id="clearBtn" class="btn-danger">🗑️ Limpar</button>
-            </div>            
-            <button id="configBtn" style="background-color: #34495e;">⚙️ Config. Gerais & Prompt</button>
+                <button id="configBtn" style="background-color: #34495e;">⚙️ Config. Gerais & Prompt</button>
+                <button id="toggleVisibilityBtn" style="background-color: #7f8c8d;">👁️ Ocultar Componentes</button>
                 <a href="resistor_calculator.html" target="_blank" class="btn-label" style="background-color: #8e44ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Calc. Resistor</a>
                 <a href="../eletronic/frontend/components.html" target="_blank" class="btn-label" style="background-color: #4e50ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Componentes</a>
-                
-            <p style="font-size: 11px; color: #666;"><i>Toque e arraste na imagem para criar shapes. Toque em um shape para editar.</i></p>
-            
+                <p style="font-size: 11px; color: #666;"><i>Toque e arraste na imagem para criar shapes. Toque em um shape para editar.</i></p>
+            </div>
             <div class="canvas-container" id="canvasContainer">
                 <img id="sourceImage" src="" alt="Carregue uma imagem para começar">
-                
                 <svg id="svgOverlay">
                     <line id="connectorLine" x1="0" y1="0" x2="0" y2="0" stroke="#2ecc71" stroke-width="2" stroke-dasharray="4" style="display:none;" />
                 </svg>
-
                 <div id="componentTooltip">
                     <div id="tipTitle"><b>-</b></div>
                     <div id="tipType">Tipo: -</div>
@@ -243,31 +278,35 @@
                 </div>
             </div>
         </div>
-
         <div class="json-section">
             <div class="json-header">
                 <h2>Estrutura JSON</h2>
                 <button id="copyJsonBtn" style="background-color: #2980b9; padding: 6px 10px; font-size: 11px;">📋 Copiar</button>
             </div>
             <textarea id="jsonOutput" readonly></textarea>
+            
+            <div class="components-summary-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #3e3e42; padding-bottom: 5px; margin-bottom: 10px;">
+                    <h3 style="margin: 0; border: none; padding: 0;">Componentes Mapeados (Contagem)</h3>
+                    <span id="totalComponentsCount" style="background: #2d2d30; border: 1px solid #3e3e42; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-family: monospace;">Total: 0</span>
+                </div>
+                <div id="componentsSummaryList" class="summary-grid">
+                    <span style="color: #888;">Nenhum componente mapeado ainda.</span>
+                </div>
+            </div>
         </div>
     </div>
-
     <div class="modal" id="editModal">
         <div class="modal-content">
             <h3>Editar Componente</h3>
             <label>Marcação (Ex: Q1, C3, R2):</label>
             <input type="text" id="modalName">
-            
             <label>Tipo / Função:</label>
             <input type="text" id="modalType">
-
             <label>Especificação / Valor:</label>
             <input type="text" id="modalValue">
-
             <label>Observação:</label>
             <textarea id="modalObs" rows="3" ></textarea>
-
             <div class="modal-buttons">
                 <button id="modalDelete" class="btn-danger">Excluir</button>
                 <button id="modalClone" style="background-color: #f39c12;">Clonar</button>
@@ -280,13 +319,10 @@
         <div class="modal-content" style="max-width: 500px;">
             <h3>Configurações Gerais & Prompt (JSON)</h3>
             <p style="font-size: 11px; color: #666; margin-top: 0;">Edite abaixo a estrutura de identificação geral e os prompts de diagnóstico em formato JSON válido.</p>
-            
             <label>Identificação Geral (JSON):</label>
             <textarea id="configIdentificacaoJson" rows="6" style="font-family: monospace; font-size: 11px; background: #2d2d2d; color: #9cdcfe; resize: vertical;"></textarea>
-
             <label style="margin-top: 10px;">Prompt de Diagnóstico (JSON Array/Object):</label>
             <textarea id="configPromptJson" rows="8" style="font-family: monospace; font-size: 11px; background: #2d2d2d; color: #9cdcfe; resize: vertical;"></textarea>
-
             <div class="modal-buttons">
                 <button id="configCancel" style="background-color: #7f8c8d;">Cancelar</button>
                 <button id="configSave" class="btn-success">Salvar</button>
@@ -295,6 +331,8 @@
     </div>
 
 <script>    
+    const toggleVisibilityBtn = document.getElementById('toggleVisibilityBtn');
+    let componentsVisible = true;
     const modalClone = document.getElementById('modalClone');
     const uploadImage = document.getElementById('uploadImage');
     const uploadJson = document.getElementById('uploadJson');
@@ -329,6 +367,8 @@
     const tipType = document.getElementById('tipType');
     const tipValue = document.getElementById('tipValue');
     const tipObs = document.getElementById('tipObs');
+    const componentsSummaryList = document.getElementById('componentsSummaryList');
+    const totalComponentsCount = document.getElementById('totalComponentsCount');
 
     let shapes = [];
     let currentShape = null;
@@ -352,17 +392,62 @@
         "componentes_mapeados": []
     };
 
+    function updateComponentsSummary() {
+        // Atualiza o Total Geral
+        const total = shapes ? shapes.length : 0;
+        if (totalComponentsCount) {
+            totalComponentsCount.textContent = `Total: ${total}`;
+        }
+
+        if (!shapes || shapes.length === 0) {
+            componentsSummaryList.innerHTML = '<span style="color: #888;">Nenhum componente mapeado ainda.</span>';
+            return;
+        }
+
+        // Conta a frequência de cada prefixo
+        const counts = {};
+        
+        shapes.forEach(shape => {
+            let prefix = "OUTROS";
+            if (shape.marcacao && shape.marcacao !== "Novo") {
+                const match = shape.marcacao.trim().toUpperCase().match(/^[A-Z]+/);
+                if (match) {
+                    prefix = match[0];
+                }
+            }
+            counts[prefix] = (counts[prefix] || 0) + 1;
+        });
+
+        const sortedKeys = Object.keys(counts).sort();
+
+        componentsSummaryList.innerHTML = "";
+        sortedKeys.forEach(prefix => {
+            const badge = document.createElement('div');
+            badge.className = 'summary-badge';
+            
+            const colorTag = getColorByPrefix(prefix + "1");
+            badge.style.borderLeft = `3px solid ${colorTag}`;
+
+            badge.innerHTML = `${prefix}: <span>${counts[prefix]}</span>`;
+            componentsSummaryList.appendChild(badge);
+        });
+    }
+
     function getColorByPrefix(marcacao) {
         if (!marcacao) return "#3498db"; 
         const marcacaoLimpa = marcacao.trim().toUpperCase();
         
-        // Tratamento para prefixos de 2 letras (como RV ou RT)
+        // Tratamento para prefixos de 2 letras
         const prefix2 = marcacaoLimpa.substring(0, 2);
         if (prefix2 === 'RV') return '#e84393'; // Varistor (Rosa)
         if (prefix2 === 'RT') return '#00b894'; // Termistor NTC/PTC (Verde-água)
         if (prefix2 === 'TH') return '#00b894'; // Termistor alternativo
+        if (prefix2 === 'JP') return '#f39c12'; // Jumper (Laranja/Amarelo forte)
 
         const prefix = marcacaoLimpa.charAt(0);
+
+        // Se quiser que 'W' também funcione como Jumper/Fio (Wire)
+        if (prefix === 'W') return '#f39c12';
 
         switch (prefix) {
             case 'R':  return '#e67e22';  // Resistor
@@ -374,7 +459,7 @@
             case 'J':  return '#2980b9';  // Conector (Entrada / Saída)
             case 'HS': return '#7f8c8d';  // Dissipador de Calor (Heat Sink)
             case 'U':  return '#34495e';  // Circuito Integrado
-            case 'L':  return '#27ae60';  // Indutor / Bobina
+            case 'L':  return '#27ae60';  // Indutor / Bobina / Ferrite com fio
             case 'F':  return '#d35400';  // Fusível
             case 'V':  return '#e84393';  // Varistor
             default:   return '#95a5a6';  // Outros / Desconhecido
@@ -382,6 +467,22 @@
     }
 
     window.addEventListener('resize', () => {
+        renderShapes();
+    });
+
+    toggleVisibilityBtn.addEventListener('click', () => {
+        componentsVisible = !componentsVisible;
+        
+        // Altera o texto e a cor do botão para feedback visual
+        if (componentsVisible) {
+            toggleVisibilityBtn.innerText = "👁️ Ocultar Componentes";
+            toggleVisibilityBtn.style.backgroundColor = "#7f8c8d";
+        } else {
+            toggleVisibilityBtn.innerText = "👁️‍🗨️ Exibir Componentes";
+            toggleVisibilityBtn.style.backgroundColor = "#95a5a6";
+        }
+        
+        // Atualiza a renderização respeitando o estado atual
         renderShapes();
     });
 
@@ -428,6 +529,7 @@
                     shapes = loadedData.componentes_mapeados || [];
                     renderShapes();
                     updateJSONView();
+                    updateComponentsSummary();
                 } catch (err) {
                     console.error("Erro ao processar o JSON automático.");
                 }
@@ -695,6 +797,7 @@
     });
 
     function renderShapes() {
+        updateComponentsSummary();
         document.querySelectorAll('.shape-box').forEach(el => el.remove());
         if (!sourceImage.complete || sourceImage.clientWidth === 0) return;
 
@@ -702,6 +805,9 @@
         const imgH = sourceImage.clientHeight;
 
         shapes.forEach((shape, index) => {
+            // Se a visualização estiver desativada, não cria/exibe as caixas na tela
+            if (!componentsVisible) return;
+
             const box = document.createElement('div');
             box.className = 'shape-box';
 
