@@ -549,9 +549,9 @@
     },
     {
       "id": "comp_1790511983843",
-      "marcacao": "J",
-      "tipo": "Entrada",
-      "especificacao": "110V",
+      "marcacao": "J1",
+      "tipo": "Jack",
+      "especificacao": "Entrada 110v",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
         "x": 0.7579,
@@ -562,9 +562,9 @@
     },
     {
       "id": "comp_1790512001683",
-      "marcacao": "J",
-      "tipo": "Saída",
-      "especificacao": "12v",
+      "marcacao": "J2",
+      "tipo": "Jack",
+      "especificacao": "Saida /12v",
       "observacao": "medições:\ninboard:\noffboard:",
       "coordenadas": {
         "x": 0.9719,
@@ -705,6 +705,6 @@
     }
   ],
   "fonte_das_informacoes": {
-    "arquivo": "fonte_12_v0_8a_b.jpg"
+    "arquivo": "fonte_12_v0_8a.jpg"
   }
 }

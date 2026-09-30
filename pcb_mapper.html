@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>⚡</text></svg>"/>
+    <script src="../eletronic/data/data_components.js"></script>    
     <title>PCB Mapper - Mapeador de Componentes</title>
     <style>
         body {
@@ -246,7 +247,7 @@
     </style>
 </head>
 <body>
-    <h1>PCB Mapper - Mapeador Visual de Componentes</h1>
+    <h1>PCB Mapper - Mapeador Visual de Componentes</h1>    
     <div class="container">
         <div class="editor-section">
             <div class="controls">
@@ -263,6 +264,26 @@
                 <button id="toggleVisibilityBtn" style="background-color: #7f8c8d;">👁️ Ocultar Componentes</button>
                 <a href="resistor_calculator.html" target="_blank" class="btn-label" style="background-color: #8e44ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Calc. Resistor</a>
                 <a href="../eletronic/frontend/components.html" target="_blank" class="btn-label" style="background-color: #4e50ad; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ω Componentes</a>
+                <span id="helpTipContainer" style="position: relative; display: inline-block;">
+                    <span id="helpTipBtn" style="background-color: #3498db; color: white; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                        💡 Dicas
+                    </span>
+                    
+                    <!-- Balão flutuante inteligente (posicionamento dinâmico via JS) -->
+                    <span id="floatingTipBox" style="display: none; position: fixed; background: rgba(30, 30, 30, 0.98); color: #fff; padding: 10px 14px; border-radius: 6px; font-size: 11px; width: 300px; z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 4px solid #2ecc71; text-align: left; line-height: 1.5; pointer-events: none;">
+                        <b style="color: #2ecc71;">Guia Rápido & Testes:</b><br>
+                        • <b>Resistor 3 Dígitos (ex: 225):</b> 22 + 5 zeros = 2.2MΩ<br>
+                        • <b>Capacitor Cerâmico (ex: 225):</b> 22 + 5 zeros pF = 2.2µF<br>
+                        • <b>Prefixos:</b> <b>R</b> (Resistor), <b>C</b> (Capacitor), <b>Q</b> (Transistor), <b>D</b> (Diodo)<br>
+                        <hr style="border: 0; border-top: 1px solid #444; margin: 6px 0;">
+                        <b style="color: #f1c40f;">Dicas de Teste Rápido:</b><br>
+                        • <b>Diodo / LED:</b> Escala de diodo. Conduz de um lado (~0.4V a 0.7V) e infinito (OL) invertido.<br>
+                        • <b>Resistor:</b> Meça fora da placa próximo ao valor nominal.<br>
+                        • <b>Capacitor Eletrolítico:</b> Sem curto direto (continuidade apitando indica fuga).<br>
+                        • <b>Fusível (F):</b> Continuidade obrigatória (se aberto, queimado).<br>
+                        • <b>Bobina (L):</b> Continuidade direta (&lt; 1 ohm).
+                    </span>
+                </span>
                 <p style="font-size: 11px; color: #666;"><i>Toque e arraste na imagem para criar shapes. Toque em um shape para editar.</i></p>
             </div>
             <div class="canvas-container" id="canvasContainer">
@@ -275,13 +296,20 @@
                     <div id="tipType">Tipo: -</div>
                     <div id="tipValue">Valor: -</div>
                     <div id="tipObs" style="margin-top: 4px; color: #f1c40f;">Obs: -</div>
-                </div>
+                </div>                    
             </div>
         </div>
         <div class="json-section">
             <div class="json-header">
-                <h2>Estrutura JSON</h2>
-                <button id="copyJsonBtn" style="background-color: #2980b9; padding: 6px 10px; font-size: 11px;">📋 Copiar</button>
+                <h2 id="viewTitle">Estrutura JSON</h2>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <select id="viewSelector" style="background-color: #2c3e50; color: white; padding: 5px 8px; font-size: 11px; border-radius: 4px; border: 1px solid #4f5b66; cursor: pointer;">
+                        <option value="json">Ver JSON</option>
+                        <option value="identificadorComponentes">Identificador Componentes</option>
+                        <option value="testeComponente">Teste Componente</option>
+                    </select>
+                    <button id="copyJsonBtn" style="background-color: #2980b9; padding: 6px 10px; font-size: 11px;">📋 Copiar</button>
+                </div>
             </div>
             <textarea id="jsonOutput" readonly></textarea>
             
@@ -301,12 +329,24 @@
             <h3>Editar Componente</h3>
             <label>Marcação (Ex: Q1, C3, R2):</label>
             <input type="text" id="modalName">
+            
             <label>Tipo / Função:</label>
-            <input type="text" id="modalType">
+            <!-- Adicionado o atributo list aqui -->
+            <input type="text" id="modalType" list="sugestoes-tipos">
+            <datalist id="sugestoes-tipos"></datalist>
+
             <label>Especificação / Valor:</label>
-            <input type="text" id="modalValue">
+            <!-- Adicionado o atributo list aqui -->
+            <input type="text" id="modalValue" list="sugestoes-valores">
+            <datalist id="sugestoes-valores"></datalist>
+
             <label>Observação:</label>
-            <textarea id="modalObs" rows="3" ></textarea>
+            <div style="position: relative; width: 100%;">
+                <textarea id="modalObs" rows="3" style="width: 100%; box-sizing: border-box;"></textarea>
+                <!-- Caixa de sugestões personalizada -->
+                <div id="obsDropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; border-radius: 4px; max-height: 120px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"></div>
+            </div>
+            
             <div class="modal-buttons">
                 <button id="modalDelete" class="btn-danger">Excluir</button>
                 <button id="modalClone" style="background-color: #f39c12;">Clonar</button>
@@ -370,6 +410,10 @@
     const componentsSummaryList = document.getElementById('componentsSummaryList');
     const totalComponentsCount = document.getElementById('totalComponentsCount');
 
+    const helpBtn = document.getElementById('helpTipBtn');
+    const tipBox = document.getElementById('floatingTipBox');
+
+    let currentView = 'json';
     let shapes = [];
     let currentShape = null;
     let isDrawing = false;
@@ -386,9 +430,30 @@
     let currentImageName = "mapeamento_pcb";
 
     let databaseJSON = {
+        "Agente_de_IA":"Execute o prompt de diagnóstico abaixo seguindo rigorosamente todas as regras estabelecidas.",
         "identificacao_geral": {
             "tipo_provavel": "Placa Eletrônica / Circuito"
         },
+        "Prompt_de_diagnostico": [
+            {
+                "sintomas_observados": [
+                    "Tensão no primario ?? V",
+                    "Oscilando ???"
+                ],
+                "instrucao_para_o_ia": "Com base no JSON de mapeamento da placa e nas regras inegociáveis abaixo, execute um diagnóstico técnico impecável, cruzando absolutamente todas as medições inboard e offboard com ou sem corrente registradas, sem omitir nenhum componente, começando pelo teste.",
+                "prompt_de_diagnostico_rigoroso": {
+                    "regras_inegociaveis": {
+                        "1_leitura_integral_e_cruzamento": "Analise, cruze e cite obrigatoriamente TODAS as medições fornecidas (tanto inboard quanto offboard) e observações de cada componente mapeado no JSON. Nenhuma medição registrada pode ser esquecida ou tratada de forma isolada.",
+                        "2_pontos_coordenadas": "Utilize a posição física e os pontos coordenadas de cada componente na placa para associar conexões físicas, trilhas e proximidades.",
+                        "3_orientacao_da_placa": "Considere a imagem dividida verticalmente ao meio: o lado esquerdo contém os componentes e o lado direito contém a malha (trilhas/soldas).",
+                        "4_omissao_de_componentes": "Se houver omissão de algum componente essencial para iniciar o diagnóstico, aponte-o explicitamente. Caso contrário, foque estritamente nos componentes que já possuem medições registradas no JSON.",
+                        "5_base_exclusiva_nos_testes_feitos": "ATENÇÃO ABSOLUTA: Verifique o campo 'offboard' de cada componente antes de gerar a resposta. Se o campo offboard já possuir dados preenchidos, a peça JÁ FOI REMOVIDA E TESTADA — é estritamente proibido sugerir sua nova remoção ou novo isolamento. Utilize o dado offboard existente para avançar diretamente para o próximo componente da cadeia lógica.",
+                        "6_passo_a_passo_com_ferramentas": "Ao sugerir qualquer novo teste válido (em peças que ainda não foram isoladas), forneça um passo a passo detalhado, prático e seguro, utilizando exclusivamente as ferramentas declaradas pelo usuário (Multímetro Anegg SZ08, ferro de solda, sugador, alicates, sem osciloscópio).",
+                        "7_alertas_de_tags": "Informe explicitamente possíveis erros comuns ao etiquetar ou posicionar tags nos componentes (ex: inversão de polaridade em eletrolíticos, confusão em valores de resistores SMD ou mistura de malhas primária e secundária)."
+                    }
+                }
+            }
+        ],
         "componentes_mapeados": []
     };
 
@@ -443,6 +508,7 @@
         if (prefix2 === 'RT') return '#00b894'; // Termistor NTC/PTC (Verde-água)
         if (prefix2 === 'TH') return '#00b894'; // Termistor alternativo
         if (prefix2 === 'JP') return '#f39c12'; // Jumper (Laranja/Amarelo forte)
+        if (prefix2 === 'BD') return '#9b59b6'; // Ponte Retificadora (Mesma cor de Diodo)
 
         const prefix = marcacaoLimpa.charAt(0);
 
@@ -531,7 +597,8 @@
                     updateJSONView();
                     updateComponentsSummary();
                 } catch (err) {
-                    console.error("Erro ao processar o JSON automático.");
+                    console.error("Erro ao processar o JSON automático:", err);
+                    alert("O arquivo JSON selecionado é inválido ou está mal formatado. Verifique o console para detalhes.");
                 }
             };
             jsonReader.readAsText(jsonFile);
@@ -798,6 +865,7 @@
 
     function renderShapes() {
         updateComponentsSummary();
+        atualizarSugestoes(shapes);
         document.querySelectorAll('.shape-box').forEach(el => el.remove());
         if (!sourceImage.complete || sourceImage.clientWidth === 0) return;
 
@@ -978,11 +1046,201 @@
         }
     });
 
+    if (helpBtn && tipBox) {
+        helpBtn.addEventListener('mouseenter', () => {
+            const rect = helpBtn.getBoundingClientRect();
+            tipBox.style.display = 'block';
+            
+            let top = rect.bottom + 8;
+            let left = rect.left;
+
+            // Se o balão passar da lateral direita da tela, puxa ele para a esquerda
+            const boxWidth = 300;
+            if (left + boxWidth > window.innerWidth - 20) {
+                left = window.innerWidth - boxWidth - 20;
+            }
+            if (left < 10) left = 10;
+
+            // Se o balão passar da parte de baixo da tela, joga ele para cima do botão
+            const boxHeight = tipBox.offsetHeight || 220;
+            if (top + boxHeight > window.innerHeight - 20) {
+                top = rect.top - boxHeight - 8;
+            }
+
+            tipBox.style.top = `${top}px`;
+            tipBox.style.left = `${left}px`;
+        });
+
+        helpBtn.addEventListener('mouseleave', () => {
+            tipBox.style.display = 'none';
+        });
+    }
+
+    // Função atualizada para renderizar o conteúdo com base na opção selecionada no combobox
     function updateJSONView() {
-        jsonOutput.value = JSON.stringify(databaseJSON, null, 2);
+        const viewSelector = document.getElementById('viewSelector');
+        const viewTitle = document.getElementById('viewTitle');
+        if (!viewSelector) return;
+        const selectedValue = viewSelector.value;
+        if (selectedValue === 'json') {
+            const targetData = (typeof DATA !== 'undefined') ? DATA : databaseJSON;
+            jsonOutput.value = JSON.stringify(targetData, null, 2);
+            if (viewTitle) viewTitle.textContent = "Estrutura JSON";
+        } else if (prompts[selectedValue]) {
+            const jsonWrapper = {
+                "tipo": "prompt_sistema",
+                "chave": selectedValue,
+                "conteudo": prompts[selectedValue]
+            };
+            jsonOutput.value = JSON.stringify(jsonWrapper, null, 2);
+            if (viewTitle) viewTitle.textContent = "Prompt (JSON): " + selectedValue;
+        }
+    }
+
+    function atualizarSugestoes(dadosJson) {
+        const tiposUnicos = new Set();
+        const valoresUnicos = new Set();
+        const obsUnicas = new Set();
+
+        // 1. Extrai dinamicamente os tipos e especificações do objeto DATA
+        if (typeof DATA !== 'undefined') {
+            Object.values(DATA).forEach(categoria => {
+                if (Array.isArray(categoria)) {
+                    categoria.forEach(item => {
+                        if (item.name && item.name.trim() !== "") {
+                            tiposUnicos.add(item.name.trim());
+                        }
+                        if (item.spec && item.spec.trim() !== "") {
+                            valoresUnicos.add(item.spec.trim());
+                        }
+                    });
+                }
+            });
+        }
+
+        // 2. Textos fixos iniciais para o campo de Observações
+        const obsFixas = [
+            "Medições:\ninboard:\noffboard:",
+            "Outros:"
+        ];
+        obsFixas.forEach(obs => obsUnicas.add(obs));
+
+        // 3. Varre o JSON da placa coletando os dados já utilizados no projeto
+        if (Array.isArray(dadosJson)) {
+            dadosJson.forEach(comp => {
+                if (comp.tipo && comp.tipo.trim() !== "" && comp.tipo.trim() !== "Não especificado") {
+                    tiposUnicos.add(comp.tipo.trim());
+                }
+                if (comp.especificacao && comp.especificacao.trim() !== "" && comp.especificacao.trim() !== "N/A") {
+                    valoresUnicos.add(comp.especificacao.trim());
+                }
+                if (comp.observacao && comp.observacao.trim() !== "") {
+                    obsUnicas.add(comp.observacao.trim());
+                }
+            });
+        }
+
+        // Evento disparado quando você altera a opção no combobox
+        document.getElementById('viewSelector').addEventListener('change', updateJSONView);
+
+        // Popula o datalist de Tipos
+        const datalistTipos = document.getElementById('sugestoes-tipos');
+        if (datalistTipos) {
+            datalistTipos.innerHTML = '';
+            tiposUnicos.forEach(tipo => {
+                const option = document.createElement('option');
+                option.value = tipo;
+                datalistTipos.appendChild(option);
+            });
+        }
+
+        // Popula o datalist de Valores/Especificações
+        const datalistValores = document.getElementById('sugestoes-valores');
+        if (datalistValores) {
+            datalistValores.innerHTML = '';
+            valoresUnicos.forEach(valor => {
+                const option = document.createElement('option');
+                option.value = valor;
+                datalistValores.appendChild(option);
+            });
+        }
+
+        // Gerencia o menu flutuante personalizado para o Textarea de Observações
+        const modalObs = document.getElementById('modalObs');
+        const obsDropdown = document.getElementById('obsDropdown');
+
+        if (modalObs && obsDropdown) {
+            const novoObs = modalObs.cloneNode(true);
+            modalObs.parentNode.replaceChild(novoObs, modalObs);
+            
+            const obsAtualizado = document.getElementById('modalObs');
+
+            const renderDropdown = (filtro = "") => {
+                obsDropdown.innerHTML = '';
+                const filtradas = Array.from(obsUnicas).filter(obs => obs.toLowerCase().includes(filtro.toLowerCase()));
+                
+                if (filtradas.length === 0) {
+                    obsDropdown.style.display = 'none';
+                    return;
+                }
+
+                filtradas.forEach(obs => {
+                    const item = document.createElement('div');
+                    item.innerText = obs;
+                    item.style.padding = '8px 12px';
+                    item.style.cursor = 'pointer';
+                    item.style.borderBottom = '1px solid #f0f0f0';
+                    item.style.fontSize = '13px';
+                    item.style.color = '#333';
+
+                    item.addEventListener('mouseenter', () => item.style.backgroundColor = '#f0f0f0');
+                    item.addEventListener('mouseleave', () => item.style.backgroundColor = 'white');
+                    
+                    item.addEventListener('mousedown', (e) => {
+                        e.preventDefault(); // Impede o blur do textarea
+                        obsAtualizado.value = obs;
+                        obsDropdown.style.display = 'none';
+                    });
+
+                    obsDropdown.appendChild(item);
+                });
+                obsDropdown.style.display = 'block';
+            };
+
+            obsAtualizado.addEventListener('focus', () => renderDropdown(obsAtualizado.value));
+            obsAtualizado.addEventListener('input', () => renderDropdown(obsAtualizado.value));
+            obsAtualizado.addEventListener('blur', () => {
+                setTimeout(() => obsDropdown.style.display = 'none', 200);
+            });
+        }
     }
 
     updateJSONView();
+
+    // Objeto com os prompts organizados
+    const prompts = {
+        identificadorComponentes: `Quero que você atue como um especialista em eletrônica, engenharia reversa e organização de inventário de componentes de bancada (sucatas de fontes chaveadas, monitores, impressoras e placas eletrônicas).
+    O nosso objetivo é identificar e catalogar códigos de fabricação, part numbers, lotes e características físicas de componentes magnéticos (como CIs, transitors, Mosfets, transformadores chopper, bobinas, indutores, inversores, ...).
+    O fluxo de trabalho para cada item que eu enviar será o seguinte:
+    1. Eu vou enviar um código bruto impresso no componente (ex: códigos de série, lotes ou part numbers).
+    2. Você vai analisar o padrão do código dentro do contexto de eletrônica.
+    3. Se necessário, você me perguntará características físicas (como quantidade de entradas/pinos primários e saídas/pinos secundários) para confirmar o tipo exato do componente.
+    4. Ao final, você me entregará o elemento formatado em formato JSON para eu adicionar diretamente ao meu objeto DATA, seguindo estritamente este padrão de estrutura:
+       {name: "Nome do Componente", spec: "Código Completo / Descrição dos Pinos", quantity: 1, unit: "un"}, e me orientar como classifico "IDEs","Capacitores","Resistores","Diodos/Transistores","LEDs/Buzzers","Conectores","Sensores","Microcontroladores","Circuito Integrado","Reguladores","Ferramentas","Telas e Displays","Shield","Processador","Novos/Componentes","Novos/Módulos","Shields/Acessórios","Baterias","Fontes","Outros" e qual designador R1,C1,Q1,D1,T1,B1,J1,HS1,U1,L1,F1,V1,RV1,RT1,TH1,JP1,BD. 
+    Compreendido? Se sim, me dê um breve "Pronto!" e aguarde o meu primeiro código.`,
+        testeComponente: `Quero que você atue como um técnico sênior em eletrônica e instrumentação de bancada, especialista em testes práticos, diagnósticos e medições com multímetro, capacímetro, osciloscópio e estação de trabalho.
+    O nosso objetivo é criar um guia passo a passo, seguro e objetivo para testar a integridade, funcionamento ou defeitos de um componente eletrônico específico que eu vou te informar.
+    O fluxo de trabalho será o seguinte:
+    1. Eu vou informar o nome ou o código do componente (ex: transformador chopper, diodo, mosfet, capacitor, etc.).
+    2. Você vai me orientar sobre:
+       - Quais instrumentos de medição utilizar (ex: multímetro digital na escala de continuidade/resistência, capacímetro, etc.).
+       - Como identificar os pinos ou terminais corretos para a medição.
+       - O passo a passo prático de como colocar as ponteiras.
+       - Quais são os valores esperados para um componente bom (saudável) versus os sintomas claros de um componente defeituoso (em curto, aberto ou com fuga).
+       - Alertas importantes de segurança (ex: descarregar capacitores antes de medir, cuidado com tensão de rede, etc.).
+    Compreendido? Se sim, me dê um breve "Pronto!" e me pergunte qual componente vamos testar agora.`
+    };
+
 </script>
 </body>
 </html>
