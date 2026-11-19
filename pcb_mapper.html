@@ -443,7 +443,7 @@
                 "instrucao_para_o_ia": "Com base no JSON de mapeamento da placa e nas regras inegociáveis abaixo, execute um diagnóstico técnico impecável, cruzando absolutamente todas as medições inboard e offboard com ou sem corrente registradas, sem omitir nenhum componente, começando pelo teste.",
                 "prompt_de_diagnostico_rigoroso": {
                     "regras_inegociaveis": {
-                        "1_leitura_integral_e_cruzamento": "Analise, cruze e cite obrigatoriamente TODAS as medições fornecidas (tanto inboard quanto offboard) e observações de cada componente mapeado no JSON. Nenhuma medição registrada pode ser esquecida ou tratada de forma isolada.",
+                        "1_leitura_integral_e_cruzamento": "Analise os componentes_mapeados e cruze e cite obrigatoriamente TODAS as medições fornecidas (tanto inboard quanto offboard) e observações de cada componente mapeado no JSON. Nenhuma medição registrada pode ser esquecida ou tratada de forma isolada.",
                         "2_pontos_coordenadas": "Utilize a posição física e os pontos coordenadas de cada componente na placa para associar conexões físicas, trilhas e proximidades.",
                         "3_orientacao_da_placa": "Considere a imagem dividida verticalmente ao meio: o lado esquerdo contém os componentes e o lado direito contém a malha (trilhas/soldas).",
                         "4_omissao_de_componentes": "Se houver omissão de algum componente essencial para iniciar o diagnóstico, aponte-o explicitamente. Caso contrário, foque estritamente nos componentes que já possuem medições registradas no JSON.",
@@ -1080,13 +1080,26 @@
     function updateJSONView() {
         const viewSelector = document.getElementById('viewSelector');
         const viewTitle = document.getElementById('viewTitle');
-        if (!viewSelector) return;
+        const jsonOutput = document.getElementById('jsonOutput');
+
+        if (!viewSelector || !jsonOutput) return;
+
         const selectedValue = viewSelector.value;
+
         if (selectedValue === 'json') {
-            const targetData = (typeof DATA !== 'undefined') ? DATA : databaseJSON;
-            jsonOutput.value = JSON.stringify(targetData, null, 2);
+            const baseDB = typeof databaseJSON !== 'undefined' ? databaseJSON : {};
+            const targetData = typeof DATA !== 'undefined'
+                ? { ...baseDB, componentes_inventario: DATA }
+                : baseDB;
+
+            const formattedJSON = JSON.stringify(targetData, null, 2);
+            jsonOutput.value = formattedJSON;
+
             if (viewTitle) viewTitle.textContent = "Estrutura JSON";
-        } else if (prompts[selectedValue]) {
+            if (typeof prompts !== 'undefined') {
+                prompts["json"] = formattedJSON;
+            }
+        } else if (typeof prompts !== 'undefined' && prompts[selectedValue]) {
             const jsonWrapper = {
                 "tipo": "prompt_sistema",
                 "chave": selectedValue,
@@ -1215,8 +1228,6 @@
         }
     }
 
-    updateJSONView();
-
     // Objeto com os prompts organizados
     const prompts = {
         identificadorComponentes: `Quero que você atue como um especialista em eletrônica, engenharia reversa e organização de inventário de componentes de bancada (sucatas de fontes chaveadas, monitores, impressoras e placas eletrônicas).
@@ -1238,8 +1249,11 @@
        - O passo a passo prático de como colocar as ponteiras.
        - Quais são os valores esperados para um componente bom (saudável) versus os sintomas claros de um componente defeituoso (em curto, aberto ou com fuga).
        - Alertas importantes de segurança (ex: descarregar capacitores antes de medir, cuidado com tensão de rede, etc.).
-    Compreendido? Se sim, me dê um breve "Pronto!" e me pergunte qual componente vamos testar agora.`
+    Compreendido? Se sim, me dê um breve "Pronto!" e me pergunte qual componente vamos testar agora.`,
+        json: ``
     };
+
+        updateJSONView();
 
 </script>
 </body>
